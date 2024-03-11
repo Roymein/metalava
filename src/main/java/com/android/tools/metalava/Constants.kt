@@ -55,4 +55,4 @@ const val JAVA_RETENTION = "java.lang.annotation.Retention"
 const val KT_RETENTION = "kotlin.annotation.Retention"
 
 fun isRetention(qualifiedName: String?): Boolean =
-    JAVA_RETENTION == qualifiedName || KT_RETENTION == qualifiedName
+        JAVA_RETENTION == qualifiedName || KT_RETENTION == qualifiedName

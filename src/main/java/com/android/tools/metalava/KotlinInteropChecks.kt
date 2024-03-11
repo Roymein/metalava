@@ -40,26 +40,26 @@ class KotlinInteropChecks(val reporter: Reporter) {
     fun check(codebase: Codebase) {
 
         codebase.accept(object : ApiVisitor(
-            // Sort by source order such that warnings follow source line number order
-            methodComparator = MethodItem.sourceOrderComparator,
-            fieldComparator = FieldItem.comparator,
-            // No need to check "for stubs only APIs" (== "implicit" APIs)
-            includeApisForStubPurposes = false
+                // Sort by source order such that warnings follow source line number order
+                methodComparator = MethodItem.sourceOrderComparator,
+                fieldComparator = FieldItem.comparator,
+                // No need to check "for stubs only APIs" (== "implicit" APIs)
+                includeApisForStubPurposes = false
         ) {
-                private var isKotlin = false
+            private var isKotlin = false
 
-                override fun visitClass(cls: ClassItem) {
-                    isKotlin = cls.isKotlin()
-                }
+            override fun visitClass(cls: ClassItem) {
+                isKotlin = cls.isKotlin()
+            }
 
-                override fun visitMethod(method: MethodItem) {
-                    checkMethod(method, isKotlin)
-                }
+            override fun visitMethod(method: MethodItem) {
+                checkMethod(method, isKotlin)
+            }
 
-                override fun visitField(field: FieldItem) {
-                    checkField(field, isKotlin)
-                }
-            })
+            override fun visitField(field: FieldItem) {
+                checkField(field, isKotlin)
+            }
+        })
     }
 
     fun checkField(field: FieldItem, isKotlin: Boolean = field.isKotlin()) {
@@ -95,9 +95,9 @@ class KotlinInteropChecks(val reporter: Reporter) {
         val doc = method.documentation.ifEmpty { method.property?.documentation.orEmpty() }
         for (exception in exceptions.sortedBy { it.qualifiedName() }) {
             val checked = !(
-                exception.extends("java.lang.RuntimeException") ||
-                    exception.extends("java.lang.Error")
-                )
+                    exception.extends("java.lang.RuntimeException") ||
+                            exception.extends("java.lang.Error")
+                    )
             if (checked) {
                 val annotation = method.modifiers.findAnnotation("kotlin.jvm.Throws")
                 if (annotation != null) {
@@ -112,14 +112,14 @@ class KotlinInteropChecks(val reporter: Reporter) {
                     }
                 }
                 reporter.report(
-                    Issues.DOCUMENT_EXCEPTIONS, method,
-                    "Method ${method.containingClass().simpleName()}.${method.name()} appears to be throwing ${exception.qualifiedName()}; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions"
+                        Issues.DOCUMENT_EXCEPTIONS, method,
+                        "Method ${method.containingClass().simpleName()}.${method.name()} appears to be throwing ${exception.qualifiedName()}; this should be recorded with a @Throws annotation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions"
                 )
             } else {
                 if (!doc.contains(exception.simpleName())) {
                     reporter.report(
-                        Issues.DOCUMENT_EXCEPTIONS, method,
-                        "Method ${method.containingClass().simpleName()}.${method.name()} appears to be throwing ${exception.qualifiedName()}; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions"
+                            Issues.DOCUMENT_EXCEPTIONS, method,
+                            "Method ${method.containingClass().simpleName()}.${method.name()} appears to be throwing ${exception.qualifiedName()}; this should be listed in the documentation; see https://android.github.io/kotlin-guides/interop.html#document-exceptions"
                     )
                 }
             }
@@ -142,13 +142,13 @@ class KotlinInteropChecks(val reporter: Reporter) {
                         if (!modifiers.isConst()) {
                             if (modifiers.findAnnotation("kotlin.jvm.JvmField") == null) {
                                 reporter.report(
-                                    Issues.MISSING_JVMSTATIC, field,
-                                    "Companion object constants like ${field.name()} should be marked @JvmField for Java interoperability; see https://developer.android.com/kotlin/interop#companion_constants"
+                                        Issues.MISSING_JVMSTATIC, field,
+                                        "Companion object constants like ${field.name()} should be marked @JvmField for Java interoperability; see https://developer.android.com/kotlin/interop#companion_constants"
                                 )
                             } else if (modifiers.findAnnotation("kotlin.jvm.JvmStatic") != null) {
                                 reporter.report(
-                                    Issues.MISSING_JVMSTATIC, field,
-                                    "Companion object constants like ${field.name()} should be using @JvmField, not @JvmStatic; see https://developer.android.com/kotlin/interop#companion_constants"
+                                        Issues.MISSING_JVMSTATIC, field,
+                                        "Companion object constants like ${field.name()} should be using @JvmField, not @JvmStatic; see https://developer.android.com/kotlin/interop#companion_constants"
                                 )
                             }
                         }
@@ -160,24 +160,24 @@ class KotlinInteropChecks(val reporter: Reporter) {
                     // https://developer.android.com/kotlin/interop#companion_constants
                     val ktProperties = sourcePsi.declarations.filter { declaration ->
                         declaration is KtProperty && declaration.isPublic && !declaration.isVar &&
-                            !declaration.hasModifier(KtTokens.CONST_KEYWORD) &&
-                            declaration.annotationEntries.none { annotationEntry ->
-                                annotationEntry.shortName?.asString() == "JvmField"
-                            }
+                                !declaration.hasModifier(KtTokens.CONST_KEYWORD) &&
+                                declaration.annotationEntries.none { annotationEntry ->
+                                    annotationEntry.shortName?.asString() == "JvmField"
+                                }
                     }
                     for (ktProperty in ktProperties) {
                         if (ktProperty.annotationEntries.none { annotationEntry ->
-                            annotationEntry.shortName?.asString() == "JvmStatic"
-                        }
+                                    annotationEntry.shortName?.asString() == "JvmStatic"
+                                }
                         ) {
                             reporter.report(
-                                Issues.MISSING_JVMSTATIC, ktProperty,
-                                "Companion object constants like ${ktProperty.name} should be marked @JvmField for Java interoperability; see https://developer.android.com/kotlin/interop#companion_constants"
+                                    Issues.MISSING_JVMSTATIC, ktProperty,
+                                    "Companion object constants like ${ktProperty.name} should be marked @JvmField for Java interoperability; see https://developer.android.com/kotlin/interop#companion_constants"
                             )
                         } else {
                             reporter.report(
-                                Issues.MISSING_JVMSTATIC, ktProperty,
-                                "Companion object constants like ${ktProperty.name} should be using @JvmField, not @JvmStatic; see https://developer.android.com/kotlin/interop#companion_constants"
+                                    Issues.MISSING_JVMSTATIC, ktProperty,
+                                    "Companion object constants like ${ktProperty.name} should be using @JvmField, not @JvmStatic; see https://developer.android.com/kotlin/interop#companion_constants"
                             )
                         }
                     }
@@ -196,11 +196,14 @@ class KotlinInteropChecks(val reporter: Reporter) {
                     val parameter = parameters[i]
                     if (isSamCompatible(parameter)) {
                         val message =
-                            "${if (isKotlinLambda(parameter.type())) "lambda" else "SAM-compatible"
-                            } parameters (such as parameter ${i + 1}, \"${parameter.name()}\", in ${
-                            method.containingClass().qualifiedName()}.${method.name()
-                            }) should be last to improve Kotlin interoperability; see " +
-                                "https://kotlinlang.org/docs/reference/java-interop.html#sam-conversions"
+                                "${
+                                    if (isKotlinLambda(parameter.type())) "lambda" else "SAM-compatible"
+                                } parameters (such as parameter ${i + 1}, \"${parameter.name()}\", in ${
+                                    method.containingClass().qualifiedName()
+                                }.${
+                                    method.name()
+                                }) should be last to improve Kotlin interoperability; see " +
+                                        "https://kotlinlang.org/docs/reference/java-interop.html#sam-conversions"
                         reporter.report(Issues.SAM_SHOULD_BE_LAST, method, message)
                         break
                     }
@@ -248,8 +251,8 @@ class KotlinInteropChecks(val reporter: Reporter) {
                     */
             } else if (method.modifiers.findAnnotation("kotlin.jvm.JvmStatic") == null) {
                 reporter.report(
-                    Issues.MISSING_JVMSTATIC, method,
-                    "Companion object methods like ${method.name()} should be marked @JvmStatic for Java interoperability; see https://developer.android.com/kotlin/interop#companion_functions"
+                        Issues.MISSING_JVMSTATIC, method,
+                        "Companion object methods like ${method.name()} should be marked @JvmStatic for Java interoperability; see https://developer.android.com/kotlin/interop#companion_functions"
                 )
             }
         }
@@ -289,14 +292,14 @@ class KotlinInteropChecks(val reporter: Reporter) {
         }
 
         if (haveDefault && method.modifiers.findAnnotation("kotlin.jvm.JvmOverloads") == null &&
-            // Extension methods and inline functions aren't really useful from Java anyway
-            !method.isExtensionMethod() && !method.modifiers.isInline() &&
-            // Methods marked @JvmSynthetic are hidden from java, overloads not useful
-            !method.modifiers.hasJvmSyntheticAnnotation()
+                // Extension methods and inline functions aren't really useful from Java anyway
+                !method.isExtensionMethod() && !method.modifiers.isInline() &&
+                // Methods marked @JvmSynthetic are hidden from java, overloads not useful
+                !method.modifiers.hasJvmSyntheticAnnotation()
         ) {
             reporter.report(
-                Issues.MISSING_JVMSTATIC, method,
-                "A Kotlin method with default parameter values should be annotated with @JvmOverloads for better Java interoperability; see https://android.github.io/kotlin-guides/interop.html#function-overloads-for-defaults"
+                    Issues.MISSING_JVMSTATIC, method,
+                    "A Kotlin method with default parameter values should be annotated with @JvmOverloads for better Java interoperability; see https://android.github.io/kotlin-guides/interop.html#function-overloads-for-defaults"
             )
         }
     }
@@ -317,13 +320,13 @@ class KotlinInteropChecks(val reporter: Reporter) {
     private fun checkKotlinKeyword(name: String, typeLabel: String, item: Item) {
         if (isKotlinHardKeyword(name)) {
             reporter.report(
-                Issues.KOTLIN_KEYWORD, item,
-                "Avoid $typeLabel names that are Kotlin hard keywords (\"$name\"); see https://android.github.io/kotlin-guides/interop.html#no-hard-keywords"
+                    Issues.KOTLIN_KEYWORD, item,
+                    "Avoid $typeLabel names that are Kotlin hard keywords (\"$name\"); see https://android.github.io/kotlin-guides/interop.html#no-hard-keywords"
             )
         } else if (isJavaKeyword(name)) {
             reporter.report(
-                Issues.KOTLIN_KEYWORD, item,
-                "Avoid $typeLabel names that are Java keywords (\"$name\"); this makes it harder to use the API from Java"
+                    Issues.KOTLIN_KEYWORD, item,
+                    "Avoid $typeLabel names that are Java keywords (\"$name\"); this makes it harder to use the API from Java"
             )
         }
     }
@@ -362,7 +365,7 @@ class KotlinInteropChecks(val reporter: Reporter) {
     }
 
     private fun isKotlinLambda(type: TypeItem) =
-        type.toErasedTypeString() == "kotlin.jvm.functions.Function1"
+            type.toErasedTypeString() == "kotlin.jvm.functions.Function1"
 
     private fun isKotlinHardKeyword(keyword: String): Boolean {
         // From https://github.com/JetBrains/kotlin/blob/master/core/descriptors/src/org/jetbrains/kotlin/renderer/KeywordStringsGenerated.java

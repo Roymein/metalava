@@ -65,8 +65,8 @@ class ArtifactTagger {
                 specApi = ApiFile.parseApi(xmlFile, options.inputKotlinStyleNulls)
             } catch (e: ApiParseException) {
                 reporter.report(
-                    Issues.BROKEN_ARTIFACT_FILE, xmlFile,
-                    "Failed to parse $xmlFile for $artifactName artifact data.\n"
+                        Issues.BROKEN_ARTIFACT_FILE, xmlFile,
+                        "Failed to parse $xmlFile for $artifactName artifact data.\n"
                 )
                 continue
             }
@@ -79,8 +79,8 @@ class ArtifactTagger {
                 override fun visitClass(cls: ClassItem) {
                     if (cls.artifact == null && cls.isTopLevelClass()) {
                         reporter.report(
-                            Issues.NO_ARTIFACT_DATA, cls,
-                            "No registered artifact signature file referenced class ${cls.qualifiedName()}"
+                                Issues.NO_ARTIFACT_DATA, cls,
+                                "No registered artifact signature file referenced class ${cls.qualifiedName()}"
                         )
                     }
                 }
@@ -89,9 +89,9 @@ class ArtifactTagger {
     }
 
     private fun applyArtifactsFromSpec(
-        mavenSpec: String,
-        specApi: TextCodebase,
-        codebase: Codebase
+            mavenSpec: String,
+            specApi: TextCodebase,
+            codebase: Codebase
     ) {
         for (specPkg in specApi.getPackages().packages) {
             if (!specPkg.emit) {
@@ -106,8 +106,8 @@ class ArtifactTagger {
                     cls.artifact = mavenSpec
                 } else {
                     reporter.report(
-                        Issues.BROKEN_ARTIFACT_FILE, cls,
-                        "Class ${cls.qualifiedName()} belongs to multiple artifacts: ${cls.artifact} and $mavenSpec"
+                            Issues.BROKEN_ARTIFACT_FILE, cls,
+                            "Class ${cls.qualifiedName()} belongs to multiple artifacts: ${cls.artifact} and $mavenSpec"
                     )
                 }
             }

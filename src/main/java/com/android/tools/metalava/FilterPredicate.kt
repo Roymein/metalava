@@ -26,7 +26,8 @@ class FilterPredicate(private val wrapped: Predicate<Item>) : Predicate<Item> {
         return when {
             wrapped.test(method) -> true
             method is MethodItem -> !method.isConstructor() &&
-                method.findPredicateSuperMethod(wrapped) != null
+                    method.findPredicateSuperMethod(wrapped) != null
+
             else -> false
         }
     }

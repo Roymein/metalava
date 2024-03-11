@@ -25,15 +25,15 @@ import java.io.PrintWriter
 import java.util.function.Predicate
 
 class DexApiWriter(
-    private val writer: PrintWriter,
-    filterEmit: Predicate<Item>,
-    filterReference: Predicate<Item>
+        private val writer: PrintWriter,
+        filterEmit: Predicate<Item>,
+        filterReference: Predicate<Item>
 ) : ApiVisitor(
-    visitConstructorsAsMethods = true,
-    nestInnerClasses = false,
-    inlineInheritedFields = true,
-    filterEmit = filterEmit,
-    filterReference = filterReference
+        visitConstructorsAsMethods = true,
+        nestInnerClasses = false,
+        inlineInheritedFields = true,
+        filterEmit = filterEmit,
+        filterReference = filterReference
 ) {
     override fun visitClass(cls: ClassItem) {
         if (filterEmit.test(cls)) {

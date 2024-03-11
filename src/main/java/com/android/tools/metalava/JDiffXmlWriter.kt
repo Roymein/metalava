@@ -41,20 +41,20 @@ import java.util.function.Predicate
  * Doclava seems to skip type parameters; we do the same.
  */
 class JDiffXmlWriter(
-    private val writer: PrintWriter,
-    filterEmit: Predicate<Item>,
-    filterReference: Predicate<Item>,
-    private val preFiltered: Boolean,
-    private val apiName: String? = null
+        private val writer: PrintWriter,
+        filterEmit: Predicate<Item>,
+        filterReference: Predicate<Item>,
+        private val preFiltered: Boolean,
+        private val apiName: String? = null
 ) : ApiVisitor(
-    visitConstructorsAsMethods = false,
-    nestInnerClasses = false,
-    inlineInheritedFields = true,
-    methodComparator = MethodItem.comparator,
-    fieldComparator = FieldItem.comparator,
-    filterEmit = filterEmit,
-    filterReference = filterReference,
-    showUnannotated = options.showUnannotated
+        visitConstructorsAsMethods = false,
+        nestInnerClasses = false,
+        inlineInheritedFields = true,
+        methodComparator = MethodItem.comparator,
+        fieldComparator = FieldItem.comparator,
+        filterEmit = filterEmit,
+        filterReference = filterReference,
+        showUnannotated = options.showUnannotated
 ) {
     override fun visitCodebase(codebase: Codebase) {
         writer.print("<api")
@@ -238,20 +238,21 @@ class JDiffXmlWriter(
         else cls.filteredSuperClassType(filterReference)
 
         val superClassString =
-            when {
-                cls.isAnnotationType() -> JAVA_LANG_ANNOTATION
-                superClass != null -> {
-                    // doclava seems to include java.lang.Object for classes but not interfaces
-                    if (!cls.isClass() && superClass.isJavaLangObject()) {
-                        return
+                when {
+                    cls.isAnnotationType() -> JAVA_LANG_ANNOTATION
+                    superClass != null -> {
+                        // doclava seems to include java.lang.Object for classes but not interfaces
+                        if (!cls.isClass() && superClass.isJavaLangObject()) {
+                            return
+                        }
+                        XmlUtils.toXmlAttributeValue(
+                                formatType(superClass.toTypeString(context = superClass.asClass()))
+                        )
                     }
-                    XmlUtils.toXmlAttributeValue(
-                        formatType(superClass.toTypeString(context = superClass.asClass()))
-                    )
+
+                    cls.isEnum() -> JAVA_LANG_ENUM
+                    else -> return
                 }
-                cls.isEnum() -> JAVA_LANG_ENUM
-                else -> return
-            }
         writer.print("\n extends=\"")
         writer.print(superClassString)
         writer.print("\"")

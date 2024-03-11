@@ -16,21 +16,9 @@
 
 package com.android.tools.metalava
 
-import com.android.tools.metalava.model.ClassItem
-import com.android.tools.metalava.model.FieldItem
-import com.android.tools.metalava.model.Item
-import com.android.tools.metalava.model.MethodItem
-import com.android.tools.metalava.model.PackageItem
-import com.android.tools.metalava.model.ParameterItem
-import com.android.tools.metalava.model.configuration
+import com.android.tools.metalava.model.*
 import com.intellij.openapi.vfs.VfsUtilCore
-import com.intellij.psi.PsiClass
-import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiField
-import com.intellij.psi.PsiFile
-import com.intellij.psi.PsiMethod
-import com.intellij.psi.PsiPackage
-import com.intellij.psi.PsiParameter
+import com.intellij.psi.*
 import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.containingClass
@@ -42,19 +30,19 @@ import kotlin.text.Charsets.UTF_8
 const val DEFAULT_BASELINE_NAME = "baseline.txt"
 
 class Baseline(
-    /** Description of this baseline. e.g. "api-lint. */
-    val description: String,
-    val file: File?,
-    var updateFile: File?,
-    // TODO(roosa): unless file == updateFile, existing baselines will be merged into the updateFile regardless of this value
-    var merge: Boolean = false,
-    private var headerComment: String = "",
-    /**
-     * Whether, when updating the baseline, we allow the metalava run to pass even if the baseline
-     * does not contain all issues that would normally fail the run (by default ERROR level).
-     */
-    var silentUpdate: Boolean = updateFile != null && updateFile.path == file?.path,
-    private var format: FileFormat = FileFormat.BASELINE
+        /** Description of this baseline. e.g. api-lint. */
+        val description: String,
+        val file: File?,
+        var updateFile: File?,
+        // TODO(roosa): unless file == updateFile, existing baselines will be merged into the updateFile regardless of this value
+        var merge: Boolean = false,
+        private var headerComment: String = "",
+        /**
+         * Whether, when updating the baseline, we allow the metalava run to pass even if the baseline
+         * does not contain all issues that would normally fail the run (by default ERROR level).
+         */
+        var silentUpdate: Boolean = updateFile != null && updateFile.path == file?.path,
+        private var format: FileFormat = FileFormat.BASELINE
 ) {
 
     /** Map from issue id to element id to message */
@@ -122,7 +110,8 @@ class Baseline(
         return when (element) {
             is ClassItem -> element.qualifiedName()
             is MethodItem -> element.containingClass().qualifiedName() + "#" +
-                element.name() + "(" + element.parameters().joinToString { it.type().toSimpleType() } + ")"
+                    element.name() + "(" + element.parameters().joinToString { it.type().toSimpleType() } + ")"
+
             is FieldItem -> element.containingClass().qualifiedName() + "#" + element.name()
             is PackageItem -> element.qualifiedName()
             is ParameterItem -> getBaselineKey(element.containingMethod()) + " parameter #" + element.parameterIndex
@@ -144,6 +133,7 @@ class Baseline(
                     name + parameterList
                 }
             }
+
             is PsiField -> {
                 val containingClass = element.containingClass
                 val name = element.name
@@ -153,6 +143,7 @@ class Baseline(
                     name
                 }
             }
+
             is KtProperty -> {
                 val containingClass = element.containingClass()
                 val name = element.nameAsSafeName.asString()
@@ -162,6 +153,7 @@ class Baseline(
                     name
                 }
             }
+
             is PsiPackage -> element.qualifiedName
             is PsiParameter -> {
                 val method = element.declarationScope.parent
@@ -171,11 +163,13 @@ class Baseline(
                     "?"
                 }
             }
+
             is PsiFile -> {
                 val virtualFile = element.virtualFile
                 val file = VfsUtilCore.virtualToIoFile(virtualFile)
                 return getBaselineKey(file)
             }
+
             else -> element.toString()
         }
     }
@@ -202,9 +196,9 @@ class Baseline(
         for (i in 0 until lines.size - 1) {
             val line = lines[i]
             if (line.startsWith("//") ||
-                line.startsWith("#") ||
-                line.isBlank() ||
-                line.startsWith(" ")
+                    line.startsWith("#") ||
+                    line.isBlank() ||
+                    line.startsWith(" ")
             ) {
                 continue
             }
@@ -273,9 +267,9 @@ class Baseline(
 
         writer.println("Baseline issue type counts for $description baseline:")
         writer.println(
-            "" +
-                "    Count Issue Id                       Severity\n" +
-                "    ---------------------------------------------\n"
+                "" +
+                        "    Count Issue Id                       Severity\n" +
+                        "    ---------------------------------------------\n"
         )
         val list = counts.entries.toMutableList()
         list.sortWith(compareBy({ -it.value }, { it.key.name }))
@@ -287,9 +281,9 @@ class Baseline(
             total += count
         }
         writer.println(
-            "" +
-                "    ---------------------------------------------\n" +
-                "    ${String.format("%5d", total)}"
+                "" +
+                        "    ---------------------------------------------\n" +
+                        "    ${String.format("%5d", total)}"
         )
         writer.println()
     }

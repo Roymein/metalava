@@ -72,6 +72,7 @@ const val ARG_DOC_STUBS = "--doc-stubs"
 const val ARG_KOTLIN_STUBS = "--kotlin-stubs"
 const val ARG_STUBS_SOURCE_LIST = "--write-stubs-source-list"
 const val ARG_DOC_STUBS_SOURCE_LIST = "--write-doc-stubs-source-list"
+
 /**
  * Used by Firebase, see b/116185431#comment15, not used by Android Platform or AndroidX
  */
@@ -162,47 +163,64 @@ const val ARG_SDK_JAR_ROOT = "--sdk-extensions-root"
 const val ARG_SDK_INFO_FILE = "--sdk-extensions-info"
 
 class Options(
-    private val args: Array<String>,
-    /** Writer to direct output to */
-    var stdout: PrintWriter = PrintWriter(OutputStreamWriter(System.out)),
-    /** Writer to direct error messages to */
-    var stderr: PrintWriter = PrintWriter(OutputStreamWriter(System.err))
+        private val args: Array<String>,
+        /** Writer to direct output to */
+        var stdout: PrintWriter = PrintWriter(OutputStreamWriter(System.out)),
+        /** Writer to direct error messages to */
+        var stderr: PrintWriter = PrintWriter(OutputStreamWriter(System.err))
 ) {
 
     /** Internal list backing [sources] */
     private val mutableSources: MutableList<File> = mutableListOf()
+
     /** Internal list backing [sourcePath] */
     private val mutableSourcePath: MutableList<File> = mutableListOf()
+
     /** Internal list backing [classpath] */
     private val mutableClassPath: MutableList<File> = mutableListOf()
+
     /** Internal list backing [showAnnotations] */
     private val mutableShowAnnotations = MutableAnnotationFilter()
+
     /** Internal list backing [showSingleAnnotations] */
     private val mutableShowSingleAnnotations = MutableAnnotationFilter()
+
     /** Internal list backing [hideAnnotations] */
     private val mutableHideAnnotations = MutableAnnotationFilter()
+
     /** Internal list backing [hideMetaAnnotations] */
     private val mutableHideMetaAnnotations: MutableList<String> = mutableListOf()
+
     /** Internal list backing [showForStubPurposesAnnotations] */
     private val mutableShowForStubPurposesAnnotation = MutableAnnotationFilter()
+
     /** Internal list backing [stubImportPackages] */
     private val mutableStubImportPackages: MutableSet<String> = mutableSetOf()
+
     /** Internal list backing [mergeQualifierAnnotations] */
     private val mutableMergeQualifierAnnotations: MutableList<File> = mutableListOf()
+
     /** Internal list backing [mergeInclusionAnnotations] */
     private val mutableMergeInclusionAnnotations: MutableList<File> = mutableListOf()
+
     /** Internal list backing [annotationCoverageOf] */
     private val mutableAnnotationCoverageOf: MutableList<File> = mutableListOf()
+
     /** Internal list backing [hidePackages] */
     private val mutableHidePackages: MutableList<String> = mutableListOf()
+
     /** Internal list backing [skipEmitPackages] */
     private val mutableSkipEmitPackages: MutableList<String> = mutableListOf()
+
     /** Internal list backing [convertToXmlFiles] */
     private val mutableConvertToXmlFiles: MutableList<ConvertFile> = mutableListOf()
+
     /** Internal list backing [passThroughAnnotations] */
     private val mutablePassThroughAnnotations: MutableSet<String> = mutableSetOf()
+
     /** Internal list backing [excludeAnnotations] */
     private val mutableExcludeAnnotations: MutableSet<String> = mutableSetOf()
+
     /** Ignored flags we've already warned about - store here such that we don't keep reporting them */
     private val alreadyWarned: MutableSet<String> = mutableSetOf()
 
@@ -513,24 +531,26 @@ class Options(
     var includeSignatureFormatVersion: Boolean = true
 
     /** Whether to include the signature file format version header in removed signature files */
-    val includeSignatureFormatVersionNonRemoved: EmitFileHeader get() =
-        if (includeSignatureFormatVersion) {
-            EmitFileHeader.ALWAYS
-        } else {
-            EmitFileHeader.NEVER
-        }
+    val includeSignatureFormatVersionNonRemoved: EmitFileHeader
+        get() =
+            if (includeSignatureFormatVersion) {
+                EmitFileHeader.ALWAYS
+            } else {
+                EmitFileHeader.NEVER
+            }
 
     /** Whether to include the signature file format version header in removed signature files */
-    val includeSignatureFormatVersionRemoved: EmitFileHeader get() =
-        if (includeSignatureFormatVersion) {
-            if (deleteEmptyRemovedSignatures) {
-                EmitFileHeader.IF_NONEMPTY_FILE
+    val includeSignatureFormatVersionRemoved: EmitFileHeader
+        get() =
+            if (includeSignatureFormatVersion) {
+                if (deleteEmptyRemovedSignatures) {
+                    EmitFileHeader.IF_NONEMPTY_FILE
+                } else {
+                    EmitFileHeader.ALWAYS
+                }
             } else {
-                EmitFileHeader.ALWAYS
+                EmitFileHeader.NEVER
             }
-        } else {
-            EmitFileHeader.NEVER
-        }
 
     /** A baseline to check against */
     var baseline: Baseline? = null
@@ -673,10 +693,10 @@ class Options(
 
     /** File conversion tasks */
     data class ConvertFile(
-        val fromApiFile: File,
-        val outputFile: File,
-        val baseApiFile: File? = null,
-        val strip: Boolean = false
+            val fromApiFile: File,
+            val outputFile: File,
+            val baseApiFile: File? = null,
+            val strip: Boolean = false
     )
 
     /** Temporary folder to use instead of the JDK default, if any */
@@ -697,7 +717,7 @@ class Options(
         // at the top of this file; replaced once the driver runs and passes in
         // a real argv. Don't print a banner when initializing the default options.)
         if (args.isNotEmpty() && !args.contains(ARG_QUIET) && !args.contains(ARG_NO_BANNER) &&
-            !args.contains(ARG_VERSION)
+                !args.contains(ARG_VERSION)
         ) {
             if (color) {
                 stdout.print(colorized(BANNER.trimIndent(), TerminalColor.BLUE))
@@ -722,6 +742,7 @@ class Options(
             ARG_BASELINE_API_LINT, ARG_UPDATE_BASELINE_API_LINT -> baselineApiLintBuilder
             ARG_BASELINE_CHECK_COMPATIBILITY_RELEASED, ARG_UPDATE_BASELINE_CHECK_COMPATIBILITY_RELEASED
             -> baselineCompatibilityReleasedBuilder
+
             else -> error("Internal error: Invalid flag: $flag")
         }
 
@@ -760,7 +781,7 @@ class Options(
                     } else {
                         if (path.endsWith(SdkConstants.DOT_JAVA)) {
                             throw DriverException(
-                                "$arg should point to a source root directory, not a source file ($path)"
+                                    "$arg should point to a source root directory, not a source file ($path)"
                             )
                         }
                         mutableSourcePath.addAll(stringToExistingDirsOrJars(path, false))
@@ -783,15 +804,15 @@ class Options(
 
                 // TODO: Remove the legacy --merge-annotations flag once it's no longer used to update P docs
                 ARG_MERGE_QUALIFIER_ANNOTATIONS, "--merge-zips", "--merge-annotations" -> mutableMergeQualifierAnnotations.addAll(
-                    stringToExistingDirsOrFiles(
-                        getValue(args, ++index)
-                    )
+                        stringToExistingDirsOrFiles(
+                                getValue(args, ++index)
+                        )
                 )
 
                 ARG_MERGE_INCLUSION_ANNOTATIONS -> mutableMergeInclusionAnnotations.addAll(
-                    stringToExistingDirsOrFiles(
-                        getValue(args, ++index)
-                    )
+                        stringToExistingDirsOrFiles(
+                                getValue(args, ++index)
+                        )
                 )
 
                 ARG_FORCE_CONVERT_TO_WARNING_NULLABILITY_ANNOTATIONS -> {
@@ -802,15 +823,18 @@ class Options(
                 ARG_VALIDATE_NULLABILITY_FROM_MERGED_STUBS -> {
                     validateNullabilityFromMergedStubs = true
                     nullabilityAnnotationsValidator =
-                        nullabilityAnnotationsValidator ?: NullabilityAnnotationsValidator()
+                            nullabilityAnnotationsValidator ?: NullabilityAnnotationsValidator()
                 }
+
                 ARG_VALIDATE_NULLABILITY_FROM_LIST -> {
                     validateNullabilityFromList = stringToExistingFile(getValue(args, ++index))
                     nullabilityAnnotationsValidator =
-                        nullabilityAnnotationsValidator ?: NullabilityAnnotationsValidator()
+                            nullabilityAnnotationsValidator ?: NullabilityAnnotationsValidator()
                 }
+
                 ARG_NULLABILITY_WARNINGS_TXT ->
                     nullabilityWarningsTxt = stringToNewFile(getValue(args, ++index))
+
                 ARG_NULLABILITY_ERRORS_NON_FATAL ->
                     nullabilityErrorsFatal = false
 
@@ -848,6 +872,7 @@ class Options(
 
                 ARG_HIDE_ANNOTATION, "--hideAnnotations", "-hideAnnotation" ->
                     mutableHideAnnotations.add(getValue(args, ++index))
+
                 ARG_HIDE_META_ANNOTATION, "--hideMetaAnnotations", "-hideMetaAnnotation" ->
                     mutableHideMetaAnnotations.add(getValue(args, ++index))
 
@@ -919,7 +944,7 @@ class Options(
                         "inline" -> TypedefMode.INLINE
                         "none" -> TypedefMode.NONE
                         else -> throw DriverException(
-                            stderr = "$ARG_TYPEDEFS_IN_SIGNATURES must be one of ref, inline, none; was $type"
+                                stderr = "$ARG_TYPEDEFS_IN_SIGNATURES must be one of ref, inline, none; was $type"
                         )
                     }
                 }
@@ -979,9 +1004,9 @@ class Options(
                 "--previous-api" -> {
                     migrateNullsFrom = stringToExistingFile(getValue(args, ++index))
                     reporter.report(
-                        Issues.DEPRECATED_OPTION, null as File?,
-                        "--previous-api is deprecated; instead " +
-                            "use $ARG_MIGRATE_NULLNESS $migrateNullsFrom"
+                            Issues.DEPRECATED_OPTION, null as File?,
+                            "--previous-api is deprecated; instead " +
+                                    "use $ARG_MIGRATE_NULLNESS $migrateNullsFrom"
                     )
                 }
 
@@ -1017,15 +1042,17 @@ class Options(
                 ARG_NO_NATIVE_DIFF -> noNativeDiff = true
 
                 ARG_ERROR, "-error" -> setIssueSeverity(
-                    getValue(args, ++index),
-                    Severity.ERROR,
-                    arg
+                        getValue(args, ++index),
+                        Severity.ERROR,
+                        arg
                 )
+
                 ARG_WARNING, "-warning" -> setIssueSeverity(
-                    getValue(args, ++index),
-                    Severity.WARNING,
-                    arg
+                        getValue(args, ++index),
+                        Severity.WARNING,
+                        arg
                 )
+
                 ARG_LINT, "-lint" -> setIssueSeverity(getValue(args, ++index), Severity.LINT, arg)
                 ARG_HIDE, "-hide" -> setIssueSeverity(getValue(args, ++index), Severity.HIDDEN, arg)
 
@@ -1036,6 +1063,7 @@ class Options(
                     // never what we want.
                     // warningsAreErrors = true
                 }
+
                 "-lerror" -> {
                     // Temporarily disabled; this is used in various builds but is pretty much
                     // never what we want.
@@ -1055,6 +1083,7 @@ class Options(
                         }
                     }
                 }
+
                 ARG_API_LINT_IGNORE_PREFIX -> {
                     checkApiIgnorePrefix.add(getValue(args, ++index))
                 }
@@ -1074,27 +1103,33 @@ class Options(
                     }
                     list.add(getValue(args, ++index))
                 }
+
                 ARG_CURRENT_VERSION -> {
                     currentApiLevel = Integer.parseInt(getValue(args, ++index))
                     if (currentApiLevel <= 26) {
                         throw DriverException("Suspicious currentApi=$currentApiLevel, expected at least 27")
                     }
                 }
+
                 ARG_FIRST_VERSION -> {
                     firstApiLevel = Integer.parseInt(getValue(args, ++index))
                 }
+
                 ARG_CURRENT_CODENAME -> {
                     val codeName = getValue(args, ++index)
                     if (codeName != "REL") {
                         currentCodeName = codeName
                     }
                 }
+
                 ARG_CURRENT_JAR -> {
                     currentJar = stringToExistingFile(getValue(args, ++index))
                 }
+
                 ARG_GENERATE_API_LEVELS -> {
                     generateApiLevelXml = stringToNewFile(getValue(args, ++index))
                 }
+
                 ARG_APPLY_API_LEVELS -> {
                     applyApiLevelsXml = if (args.contains(ARG_GENERATE_API_LEVELS)) {
                         // If generating the API file at the same time, it doesn't have
@@ -1104,13 +1139,14 @@ class Options(
                         stringToExistingFile(getValue(args, ++index))
                     }
                 }
+
                 ARG_REMOVE_MISSING_CLASS_REFERENCES_IN_API_LEVELS -> removeMissingClassesInApiLevels = true
 
                 ARG_UPDATE_API, "--update-api" -> onlyUpdateApi = true
                 ARG_CHECK_API -> onlyCheckApi = true
 
                 ARG_CONVERT_TO_JDIFF,
-                // doclava compatibility:
+                    // doclava compatibility:
                 "-convert2xml",
                 "-convert2xmlnostrip" -> {
                     val strip = arg == "-convert2xml"
@@ -1120,7 +1156,7 @@ class Options(
                 }
 
                 ARG_CONVERT_NEW_TO_JDIFF,
-                // doclava compatibility:
+                    // doclava compatibility:
                 "-new_api",
                 "-new_api_no_strip" -> {
                     val strip = arg == "-new_api"
@@ -1158,8 +1194,8 @@ class Options(
                 ARG_KOTLIN_SOURCE -> {
                     val value = getValue(args, ++index)
                     val languageLevel =
-                        LanguageVersion.fromVersionString(value)
-                            ?: throw DriverException("$value is not a valid or supported Kotlin language level")
+                            LanguageVersion.fromVersionString(value)
+                                    ?: throw DriverException("$value is not a valid or supported Kotlin language level")
                     val apiVersion = ApiVersion.createByLanguageVersion(languageLevel)
                     val settings = LanguageVersionSettingsImpl(languageLevel, apiVersion)
                     kotlinLanguageLevel = settings
@@ -1191,6 +1227,7 @@ class Options(
                     strictInputViolationsFile = file
                     strictInputViolationsPrintWriter = file.printWriter()
                 }
+
                 ARG_STRICT_INPUT_FILES_EXEMPT -> {
                     val listString = getValue(args, ++index)
                     listString.split(File.pathSeparatorChar).forEach { path ->
@@ -1399,10 +1436,10 @@ class Options(
             patterns.add("prebuilts/tools/common/api-versions/android-%/android.jar")
             patterns.add("prebuilts/sdk/%/public/android.jar")
             apiLevelJars = findAndroidJars(
-                patterns,
-                firstApiLevel,
-                currentApiLevel + if (isDeveloperPreviewBuild()) 1 else 0,
-                currentJar
+                    patterns,
+                    firstApiLevel,
+                    currentApiLevel + if (isDeveloperPreviewBuild()) 1 else 0,
+                    currentJar
             )
         }
 
@@ -1505,12 +1542,12 @@ class Options(
         baselineCompatibilityReleased = baselineCompatibilityReleasedBuilder.build()
 
         reporterApiLint = Reporter(
-            baselineApiLint ?: baseline,
-            errorMessageApiLint
+                baselineApiLint ?: baseline,
+                errorMessageApiLint
         )
         reporterCompatibilityReleased = Reporter(
-            baselineCompatibilityReleased ?: baseline,
-            errorMessageCompatibilityReleased
+                baselineCompatibilityReleased ?: baseline,
+                errorMessageCompatibilityReleased
         )
 
         // Build "all baselines" and "all reporters"
@@ -1520,9 +1557,9 @@ class Options(
 
         // Reporters are non-null.
         allReporters = listOf(
-            reporter,
-            reporterApiLint,
-            reporterCompatibilityReleased,
+                reporter,
+                reporterApiLint,
+                reporterCompatibilityReleased,
         )
 
         updateClassPath()
@@ -1537,16 +1574,16 @@ class Options(
         val jdkHome = jdkHome
 
         if (sdkHome != null &&
-            compileSdkVersion != null &&
-            classpath.none { it.name == FN_FRAMEWORK_LIBRARY }
+                compileSdkVersion != null &&
+                classpath.none { it.name == FN_FRAMEWORK_LIBRARY }
         ) {
             val jar = File(sdkHome, "platforms/android-$compileSdkVersion")
             if (jar.isFile) {
                 mutableClassPath.add(jar)
             } else {
                 throw DriverException(
-                    stderr = "Could not find android.jar for API level " +
-                        "$compileSdkVersion in SDK $sdkHome: $jar does not exist"
+                        stderr = "Could not find android.jar for API level " +
+                                "$compileSdkVersion in SDK $sdkHome: $jar does not exist"
                 )
             }
             if (jdkHome != null) {
@@ -1554,7 +1591,8 @@ class Options(
             }
         } else if (jdkHome != null) {
             val isJre = !isJdkFolder(jdkHome)
-            @Suppress("DEPRECATION")
+
+            @Suppress("DEPRECATION", "UnstableApiUsage")
             val roots = JavaSdkUtil.getJdkClassesRoots(jdkHome, isJre)
             mutableClassPath.addAll(roots)
         }
@@ -1579,6 +1617,7 @@ class Options(
                 val name = qualifiedName.substring(qualifiedName.lastIndexOf('.') + 1)
                 return name.lowercase(Locale.US).removeSuffix("api") + "-"
             }
+
             val sb = StringBuilder()
             showAnnotations.getIncludedAnnotationNames().forEach { sb.append(annotationToPrefix(it)) }
             sb.append(DEFAULT_BASELINE_NAME)
@@ -1603,10 +1642,10 @@ class Options(
      * --strict-input-files-exempt to exempt the jar directory.
      */
     private fun findAndroidJars(
-        androidJarPatterns: List<String>,
-        minApi: Int,
-        currentApiLevel: Int,
-        currentJar: File?
+            androidJarPatterns: List<String>,
+            minApi: Int,
+            currentApiLevel: Int,
+            currentJar: File?
     ): Array<File> {
         val apiLevelFiles = mutableListOf<File>()
         // api level 0: placeholder, should not be processed.
@@ -1643,8 +1682,8 @@ class Options(
                             }
                         }
                         throw DriverException(
-                            stderr = "Could not find android.jar for API level $apiLevel; the " +
-                                "$ARG_ANDROID_JAR_PATTERN set might be invalid: ${argList.joinToString()}"
+                                stderr = "Could not find android.jar for API level $apiLevel; the " +
+                                        "$ARG_ANDROID_JAR_PATTERN set might be invalid: ${argList.joinToString()}"
                         )
                     }
 
@@ -1665,8 +1704,8 @@ class Options(
     private fun getAndroidJarFile(apiLevel: Int, patterns: List<String>): File? {
         // Note this method doesn't register the result to [FileReadSandbox]
         return patterns
-            .map { fileForPathInner(it.replace("%", apiLevel.toString())) }
-            .firstOrNull { it.isFile }
+                .map { fileForPathInner(it.replace("%", apiLevel.toString())) }
+                .firstOrNull { it.isFile }
     }
 
     private fun yesNo(answer: String): Boolean {
@@ -1690,8 +1729,8 @@ class Options(
         }
         if (!options.quiet) {
             reporter.report(
-                Severity.WARNING, null as String?, "Ignoring javadoc-related doclava1 flag $arg",
-                color = color
+                    Severity.WARNING, null as String?, "Ignoring javadoc-related doclava1 flag $arg",
+                    color = color
             )
         }
     }
@@ -1702,11 +1741,11 @@ class Options(
         }
         if (!options.quiet) {
             val message = "Ignoring unimplemented doclava1 flag $arg" +
-                when (arg) {
-                    "-encoding" -> " (UTF-8 assumed)"
-                    "-source" -> "  (1.8 assumed)"
-                    else -> ""
-                }
+                    when (arg) {
+                        "-encoding" -> " (UTF-8 assumed)"
+                        "-source" -> "  (1.8 assumed)"
+                        else -> ""
+                    }
             reporter.report(Severity.WARNING, null as String?, message, color = color)
         }
     }
@@ -1798,33 +1837,33 @@ class Options(
     private fun stringToExistingFilesOrDirsInternal(value: String, allowDirs: Boolean): List<File> {
         val files = mutableListOf<File>()
         value.split(File.pathSeparatorChar)
-            .map { fileForPathInner(it) }
-            .forEach { file ->
-                if (file.path.startsWith("@")) {
-                    // File list; files to be read are stored inside. SHOULD have been one per line
-                    // but sadly often uses spaces for separation too (so we split by whitespace,
-                    // which means you can't point to files in paths with spaces)
-                    val listFile = File(file.path.substring(1))
-                    if (!allowDirs && !listFile.isFile) {
-                        throw DriverException("$listFile is not a file")
-                    }
-                    val contents = Files.asCharSource(listFile, UTF_8).read()
-                    val pathList = Splitter.on(CharMatcher.whitespace()).trimResults().omitEmptyStrings().split(
-                        contents
-                    )
-                    pathList.asSequence().map { File(it) }.forEach {
-                        if (!allowDirs && !it.isFile) {
-                            throw DriverException("$it is not a file")
+                .map { fileForPathInner(it) }
+                .forEach { file ->
+                    if (file.path.startsWith("@")) {
+                        // File list; files to be read are stored inside. SHOULD have been one per line
+                        // but sadly often uses spaces for separation too (so we split by whitespace,
+                        // which means you can't point to files in paths with spaces)
+                        val listFile = File(file.path.substring(1))
+                        if (!allowDirs && !listFile.isFile) {
+                            throw DriverException("$listFile is not a file")
                         }
-                        files.add(it)
+                        val contents = Files.asCharSource(listFile, UTF_8).read()
+                        val pathList = Splitter.on(CharMatcher.whitespace()).trimResults().omitEmptyStrings().split(
+                                contents
+                        )
+                        pathList.asSequence().map { File(it) }.forEach {
+                            if (!allowDirs && !it.isFile) {
+                                throw DriverException("$it is not a file")
+                            }
+                            files.add(it)
+                        }
+                    } else {
+                        if (!allowDirs && !file.isFile) {
+                            throw DriverException("$file is not a file")
+                        }
+                        files.add(file)
                     }
-                } else {
-                    if (!allowDirs && !file.isFile) {
-                        throw DriverException("$file is not a file")
-                    }
-                    files.add(file)
                 }
-            }
         return FileReadSandbox.allowAccess(files)
     }
 
@@ -1877,18 +1916,18 @@ class Options(
     private fun stringToNewDir(value: String): File {
         val output = fileForPathInner(value)
         val ok =
-            if (output.exists()) {
-                if (output.isDirectory) {
-                    output.deleteRecursively()
-                }
                 if (output.exists()) {
-                    true
+                    if (output.isDirectory) {
+                        output.deleteRecursively()
+                    }
+                    if (output.exists()) {
+                        true
+                    } else {
+                        output.mkdir()
+                    }
                 } else {
-                    output.mkdir()
+                    output.mkdirs()
                 }
-            } else {
-                output.mkdirs()
-            }
         if (!ok) {
             throw DriverException("Could not create $output")
         }
@@ -1939,343 +1978,343 @@ class Options(
         }
 
         val args = arrayOf(
-            "", "\nGeneral:",
-            ARG_HELP, "This message.",
-            ARG_VERSION, "Show the version of $PROGRAM_NAME.",
-            ARG_QUIET, "Only include vital output",
-            ARG_VERBOSE, "Include extra diagnostic output",
-            ARG_COLOR, "Attempt to colorize the output (defaults to true if \$TERM is xterm)",
-            ARG_NO_COLOR, "Do not attempt to colorize the output",
-            ARG_UPDATE_API,
-            "Cancel any other \"action\" flags other than generating signature files. This is here " +
-                "to make it easier customize build system tasks, particularly for the \"make update-api\" task.",
-            ARG_CHECK_API,
-            "Cancel any other \"action\" flags other than checking signature files. This is here " +
-                "to make it easier customize build system tasks, particularly for the \"make checkapi\" task.",
-            "$ARG_REPEAT_ERRORS_MAX <N>", "When specified, repeat at most N errors before finishing.",
+                "", "\nGeneral:",
+                ARG_HELP, "This message.",
+                ARG_VERSION, "Show the version of $PROGRAM_NAME.",
+                ARG_QUIET, "Only include vital output",
+                ARG_VERBOSE, "Include extra diagnostic output",
+                ARG_COLOR, "Attempt to colorize the output (defaults to true if \$TERM is xterm)",
+                ARG_NO_COLOR, "Do not attempt to colorize the output",
+                ARG_UPDATE_API,
+                "Cancel any other \"action\" flags other than generating signature files. This is here " +
+                        "to make it easier customize build system tasks, particularly for the \"make update-api\" task.",
+                ARG_CHECK_API,
+                "Cancel any other \"action\" flags other than checking signature files. This is here " +
+                        "to make it easier customize build system tasks, particularly for the \"make checkapi\" task.",
+                "$ARG_REPEAT_ERRORS_MAX <N>", "When specified, repeat at most N errors before finishing.",
 
-            "", "\nAPI sources:",
-            "$ARG_SOURCE_FILES <files>",
-            "A comma separated list of source files to be parsed. Can also be " +
-                "@ followed by a path to a text file containing paths to the full set of files to parse.",
+                "", "\nAPI sources:",
+                "$ARG_SOURCE_FILES <files>",
+                "A comma separated list of source files to be parsed. Can also be " +
+                        "@ followed by a path to a text file containing paths to the full set of files to parse.",
 
-            "$ARG_SOURCE_PATH <paths>",
-            "One or more directories (separated by `${File.pathSeparator}`) " +
-                "containing source files (within a package hierarchy). If $ARG_STRICT_INPUT_FILES, " +
-                "$ARG_STRICT_INPUT_FILES_WARN, or $ARG_STRICT_INPUT_FILES_STACK are used, files accessed under " +
-                "$ARG_SOURCE_PATH that are not explicitly specified in $ARG_SOURCE_FILES are reported as " +
-                "violations.",
+                "$ARG_SOURCE_PATH <paths>",
+                "One or more directories (separated by `${File.pathSeparator}`) " +
+                        "containing source files (within a package hierarchy). If $ARG_STRICT_INPUT_FILES, " +
+                        "$ARG_STRICT_INPUT_FILES_WARN, or $ARG_STRICT_INPUT_FILES_STACK are used, files accessed under " +
+                        "$ARG_SOURCE_PATH that are not explicitly specified in $ARG_SOURCE_FILES are reported as " +
+                        "violations.",
 
-            "$ARG_CLASS_PATH <paths>",
-            "One or more directories or jars (separated by " +
-                "`${File.pathSeparator}`) containing classes that should be on the classpath when parsing the " +
-                "source files",
+                "$ARG_CLASS_PATH <paths>",
+                "One or more directories or jars (separated by " +
+                        "`${File.pathSeparator}`) containing classes that should be on the classpath when parsing the " +
+                        "source files",
 
-            "$ARG_MERGE_QUALIFIER_ANNOTATIONS <file>",
-            "An external annotations file to merge and overlay " +
-                "the sources, or a directory of such files. Should be used for annotations intended for " +
-                "inclusion in the API to be written out, e.g. nullability. Formats supported are: IntelliJ's " +
-                "external annotations database format, .jar or .zip files containing those, Android signature " +
-                "files, and Java stub files.",
+                "$ARG_MERGE_QUALIFIER_ANNOTATIONS <file>",
+                "An external annotations file to merge and overlay " +
+                        "the sources, or a directory of such files. Should be used for annotations intended for " +
+                        "inclusion in the API to be written out, e.g. nullability. Formats supported are: IntelliJ's " +
+                        "external annotations database format, .jar or .zip files containing those, Android signature " +
+                        "files, and Java stub files.",
 
-            "$ARG_MERGE_INCLUSION_ANNOTATIONS <file>",
-            "An external annotations file to merge and overlay " +
-                "the sources, or a directory of such files. Should be used for annotations which determine " +
-                "inclusion in the API to be written out, i.e. show and hide. The only format supported is " +
-                "Java stub files.",
+                "$ARG_MERGE_INCLUSION_ANNOTATIONS <file>",
+                "An external annotations file to merge and overlay " +
+                        "the sources, or a directory of such files. Should be used for annotations which determine " +
+                        "inclusion in the API to be written out, i.e. show and hide. The only format supported is " +
+                        "Java stub files.",
 
-            ARG_VALIDATE_NULLABILITY_FROM_MERGED_STUBS,
-            "Triggers validation of nullability annotations " +
-                "for any class where $ARG_MERGE_QUALIFIER_ANNOTATIONS includes a Java stub file.",
+                ARG_VALIDATE_NULLABILITY_FROM_MERGED_STUBS,
+                "Triggers validation of nullability annotations " +
+                        "for any class where $ARG_MERGE_QUALIFIER_ANNOTATIONS includes a Java stub file.",
 
-            ARG_VALIDATE_NULLABILITY_FROM_LIST,
-            "Triggers validation of nullability annotations " +
-                "for any class listed in the named file (one top-level class per line, # prefix for comment line).",
+                ARG_VALIDATE_NULLABILITY_FROM_LIST,
+                "Triggers validation of nullability annotations " +
+                        "for any class listed in the named file (one top-level class per line, # prefix for comment line).",
 
-            "$ARG_NULLABILITY_WARNINGS_TXT <file>",
-            "Specifies where to write warnings encountered during " +
-                "validation of nullability annotations. (Does not trigger validation by itself.)",
+                "$ARG_NULLABILITY_WARNINGS_TXT <file>",
+                "Specifies where to write warnings encountered during " +
+                        "validation of nullability annotations. (Does not trigger validation by itself.)",
 
-            ARG_NULLABILITY_ERRORS_NON_FATAL,
-            "Specifies that errors encountered during validation of " +
-                "nullability annotations should not be treated as errors. They will be written out to the " +
-                "file specified in $ARG_NULLABILITY_WARNINGS_TXT instead.",
+                ARG_NULLABILITY_ERRORS_NON_FATAL,
+                "Specifies that errors encountered during validation of " +
+                        "nullability annotations should not be treated as errors. They will be written out to the " +
+                        "file specified in $ARG_NULLABILITY_WARNINGS_TXT instead.",
 
-            "$ARG_INPUT_API_JAR <file>", "A .jar file to read APIs from directly",
+                "$ARG_INPUT_API_JAR <file>", "A .jar file to read APIs from directly",
 
-            "$ARG_MANIFEST <file>", "A manifest file, used to for check permissions to cross check APIs",
+                "$ARG_MANIFEST <file>", "A manifest file, used to for check permissions to cross check APIs",
 
-            "$ARG_HIDE_PACKAGE <package>",
-            "Remove the given packages from the API even if they have not been " +
-                "marked with @hide",
+                "$ARG_HIDE_PACKAGE <package>",
+                "Remove the given packages from the API even if they have not been " +
+                        "marked with @hide",
 
-            "$ARG_SHOW_ANNOTATION <annotation class>",
-            "Unhide any hidden elements that are also annotated " +
-                "with the given annotation",
-            "$ARG_SHOW_SINGLE_ANNOTATION <annotation>",
-            "Like $ARG_SHOW_ANNOTATION, but does not apply " +
-                "to members; these must also be explicitly annotated",
-            "$ARG_SHOW_FOR_STUB_PURPOSES_ANNOTATION <annotation class>",
-            "Like $ARG_SHOW_ANNOTATION, but elements annotated " +
-                "with it are assumed to be \"implicitly\" included in the API surface, and they'll be included " +
-                "in certain kinds of output such as stubs, but not in others, such as the signature file and API lint",
-            "$ARG_HIDE_ANNOTATION <annotation class>",
-            "Treat any elements annotated with the given annotation " +
-                "as hidden",
-            "$ARG_HIDE_META_ANNOTATION <meta-annotation class>",
-            "Treat as hidden any elements annotated with an " +
-                "annotation which is itself annotated with the given meta-annotation",
-            ARG_SHOW_UNANNOTATED, "Include un-annotated public APIs in the signature file as well",
-            "$ARG_JAVA_SOURCE <level>", "Sets the source level for Java source files; default is 1.8.",
-            "$ARG_KOTLIN_SOURCE <level>", "Sets the source level for Kotlin source files; default is ${LanguageVersionSettingsImpl.DEFAULT.languageVersion}.",
-            "$ARG_SDK_HOME <dir>", "If set, locate the `android.jar` file from the given Android SDK",
-            "$ARG_COMPILE_SDK_VERSION <api>", "Use the given API level",
-            "$ARG_JDK_HOME <dir>", "If set, add the Java APIs from the given JDK to the classpath",
-            "$ARG_STUB_PACKAGES <package-list>",
-            "List of packages (separated by ${File.pathSeparator}) which will " +
-                "be used to filter out irrelevant code. If specified, only code in these packages will be " +
-                "included in signature files, stubs, etc. (This is not limited to just the stubs; the name " +
-                "is historical.) You can also use \".*\" at the end to match subpackages, so `foo.*` will " +
-                "match both `foo` and `foo.bar`.",
-            "$ARG_SUBTRACT_API <api file>",
-            "Subtracts the API in the given signature or jar file from the " +
-                "current API being emitted via $ARG_API, $ARG_STUBS, $ARG_DOC_STUBS, etc. " +
-                "Note that the subtraction only applies to classes; it does not subtract members.",
-            "$ARG_TYPEDEFS_IN_SIGNATURES <ref|inline>",
-            "Whether to include typedef annotations in signature " +
-                "files. `$ARG_TYPEDEFS_IN_SIGNATURES ref` will include just a reference to the typedef class, " +
-                "which is not itself part of the API and is not included as a class, and " +
-                "`$ARG_TYPEDEFS_IN_SIGNATURES inline` will include the constants themselves into each usage " +
-                "site. You can also supply `$ARG_TYPEDEFS_IN_SIGNATURES none` to explicitly turn it off, if the " +
-                "default ever changes.",
-            ARG_IGNORE_CLASSES_ON_CLASSPATH,
-            "Prevents references to classes on the classpath from being added to " +
-                "the generated stub files.",
+                "$ARG_SHOW_ANNOTATION <annotation class>",
+                "Unhide any hidden elements that are also annotated " +
+                        "with the given annotation",
+                "$ARG_SHOW_SINGLE_ANNOTATION <annotation>",
+                "Like $ARG_SHOW_ANNOTATION, but does not apply " +
+                        "to members; these must also be explicitly annotated",
+                "$ARG_SHOW_FOR_STUB_PURPOSES_ANNOTATION <annotation class>",
+                "Like $ARG_SHOW_ANNOTATION, but elements annotated " +
+                        "with it are assumed to be \"implicitly\" included in the API surface, and they'll be included " +
+                        "in certain kinds of output such as stubs, but not in others, such as the signature file and API lint",
+                "$ARG_HIDE_ANNOTATION <annotation class>",
+                "Treat any elements annotated with the given annotation " +
+                        "as hidden",
+                "$ARG_HIDE_META_ANNOTATION <meta-annotation class>",
+                "Treat as hidden any elements annotated with an " +
+                        "annotation which is itself annotated with the given meta-annotation",
+                ARG_SHOW_UNANNOTATED, "Include un-annotated public APIs in the signature file as well",
+                "$ARG_JAVA_SOURCE <level>", "Sets the source level for Java source files; default is 1.8.",
+                "$ARG_KOTLIN_SOURCE <level>", "Sets the source level for Kotlin source files; default is ${LanguageVersionSettingsImpl.DEFAULT.languageVersion}.",
+                "$ARG_SDK_HOME <dir>", "If set, locate the `android.jar` file from the given Android SDK",
+                "$ARG_COMPILE_SDK_VERSION <api>", "Use the given API level",
+                "$ARG_JDK_HOME <dir>", "If set, add the Java APIs from the given JDK to the classpath",
+                "$ARG_STUB_PACKAGES <package-list>",
+                "List of packages (separated by ${File.pathSeparator}) which will " +
+                        "be used to filter out irrelevant code. If specified, only code in these packages will be " +
+                        "included in signature files, stubs, etc. (This is not limited to just the stubs; the name " +
+                        "is historical.) You can also use \".*\" at the end to match subpackages, so `foo.*` will " +
+                        "match both `foo` and `foo.bar`.",
+                "$ARG_SUBTRACT_API <api file>",
+                "Subtracts the API in the given signature or jar file from the " +
+                        "current API being emitted via $ARG_API, $ARG_STUBS, $ARG_DOC_STUBS, etc. " +
+                        "Note that the subtraction only applies to classes; it does not subtract members.",
+                "$ARG_TYPEDEFS_IN_SIGNATURES <ref|inline>",
+                "Whether to include typedef annotations in signature " +
+                        "files. `$ARG_TYPEDEFS_IN_SIGNATURES ref` will include just a reference to the typedef class, " +
+                        "which is not itself part of the API and is not included as a class, and " +
+                        "`$ARG_TYPEDEFS_IN_SIGNATURES inline` will include the constants themselves into each usage " +
+                        "site. You can also supply `$ARG_TYPEDEFS_IN_SIGNATURES none` to explicitly turn it off, if the " +
+                        "default ever changes.",
+                ARG_IGNORE_CLASSES_ON_CLASSPATH,
+                "Prevents references to classes on the classpath from being added to " +
+                        "the generated stub files.",
 
-            "", "\nDocumentation:",
-            ARG_PUBLIC, "Only include elements that are public",
-            ARG_PROTECTED, "Only include elements that are public or protected",
-            ARG_PACKAGE, "Only include elements that are public, protected or package protected",
-            ARG_PRIVATE, "Include all elements except those that are marked hidden",
-            ARG_HIDDEN, "Include all elements, including hidden",
+                "", "\nDocumentation:",
+                ARG_PUBLIC, "Only include elements that are public",
+                ARG_PROTECTED, "Only include elements that are public or protected",
+                ARG_PACKAGE, "Only include elements that are public, protected or package protected",
+                ARG_PRIVATE, "Include all elements except those that are marked hidden",
+                ARG_HIDDEN, "Include all elements, including hidden",
 
-            "", "\nExtracting Signature Files:",
-            // TODO: Document --show-annotation!
-            "$ARG_API <file>", "Generate a signature descriptor file",
-            "$ARG_DEX_API <file>", "Generate a DEX signature descriptor file listing the APIs",
-            "$ARG_REMOVED_API <file>", "Generate a signature descriptor file for APIs that have been removed",
-            "$ARG_FORMAT=<v1,v2,v3,...>", "Sets the output signature file format to be the given version.",
-            "$ARG_OUTPUT_KOTLIN_NULLS[=yes|no]",
-            "Controls whether nullness annotations should be formatted as " +
-                "in Kotlin (with \"?\" for nullable types, \"\" for non nullable types, and \"!\" for unknown. " +
-                "The default is yes.",
-            "$ARG_OUTPUT_DEFAULT_VALUES[=yes|no]",
-            "Controls whether default values should be included in " +
-                "signature files. The default is yes.",
-            "$ARG_INCLUDE_SIG_VERSION[=yes|no]",
-            "Whether the signature files should include a comment listing " +
-                "the format version of the signature file.",
+                "", "\nExtracting Signature Files:",
+                // TODO: Document --show-annotation!
+                "$ARG_API <file>", "Generate a signature descriptor file",
+                "$ARG_DEX_API <file>", "Generate a DEX signature descriptor file listing the APIs",
+                "$ARG_REMOVED_API <file>", "Generate a signature descriptor file for APIs that have been removed",
+                "$ARG_FORMAT=<v1,v2,v3,...>", "Sets the output signature file format to be the given version.",
+                "$ARG_OUTPUT_KOTLIN_NULLS[=yes|no]",
+                "Controls whether nullness annotations should be formatted as " +
+                        "in Kotlin (with \"?\" for nullable types, \"\" for non nullable types, and \"!\" for unknown. " +
+                        "The default is yes.",
+                "$ARG_OUTPUT_DEFAULT_VALUES[=yes|no]",
+                "Controls whether default values should be included in " +
+                        "signature files. The default is yes.",
+                "$ARG_INCLUDE_SIG_VERSION[=yes|no]",
+                "Whether the signature files should include a comment listing " +
+                        "the format version of the signature file.",
 
-            "$ARG_PROGUARD <file>", "Write a ProGuard keep file for the API",
-            "$ARG_SDK_VALUES <dir>", "Write SDK values files to the given directory",
+                "$ARG_PROGUARD <file>", "Write a ProGuard keep file for the API",
+                "$ARG_SDK_VALUES <dir>", "Write SDK values files to the given directory",
 
-            "", "\nGenerating Stubs:",
-            "$ARG_STUBS <dir>", "Generate stub source files for the API",
-            "$ARG_DOC_STUBS <dir>",
-            "Generate documentation stub source files for the API. Documentation stub " +
-                "files are similar to regular stub files, but there are some differences. For example, in " +
-                "the stub files, we'll use special annotations like @RecentlyNonNull instead of @NonNull to " +
-                "indicate that an element is recently marked as non null, whereas in the documentation stubs we'll " +
-                "just list this as @NonNull. Another difference is that @doconly elements are included in " +
-                "documentation stubs, but not regular stubs, etc.",
-            ARG_KOTLIN_STUBS,
-            "[CURRENTLY EXPERIMENTAL] If specified, stubs generated from Kotlin source code will " +
-                "be written in Kotlin rather than the Java programming language.",
-            ARG_INCLUDE_ANNOTATIONS, "Include annotations such as @Nullable in the stub files.",
-            ARG_EXCLUDE_ALL_ANNOTATIONS, "Exclude annotations such as @Nullable from the stub files; the default.",
-            "$ARG_PASS_THROUGH_ANNOTATION <annotation classes>",
-            "A comma separated list of fully qualified names of " +
-                "annotation classes that must be passed through unchanged.",
-            "$ARG_EXCLUDE_ANNOTATION <annotation classes>",
-            "A comma separated list of fully qualified names of " +
-                "annotation classes that must be stripped from metalava's outputs.",
-            ARG_ENHANCE_DOCUMENTATION,
-            "Enhance documentation in various ways, for example auto-generating documentation based on source " +
-                "annotations present in the code. This is implied by --doc-stubs.",
-            ARG_EXCLUDE_DOCUMENTATION_FROM_STUBS,
-            "Exclude element documentation (javadoc and kdoc) " +
-                "from the generated stubs. (Copyright notices are not affected by this, they are always included. " +
-                "Documentation stubs (--doc-stubs) are not affected.)",
-            "$ARG_STUBS_SOURCE_LIST <file>",
-            "Write the list of generated stub files into the given source " +
-                "list file. If generating documentation stubs and you haven't also specified " +
-                "$ARG_DOC_STUBS_SOURCE_LIST, this list will refer to the documentation stubs; " +
-                "otherwise it's the non-documentation stubs.",
-            "$ARG_DOC_STUBS_SOURCE_LIST <file>",
-            "Write the list of generated doc stub files into the given source " +
-                "list file",
+                "", "\nGenerating Stubs:",
+                "$ARG_STUBS <dir>", "Generate stub source files for the API",
+                "$ARG_DOC_STUBS <dir>",
+                "Generate documentation stub source files for the API. Documentation stub " +
+                        "files are similar to regular stub files, but there are some differences. For example, in " +
+                        "the stub files, we'll use special annotations like @RecentlyNonNull instead of @NonNull to " +
+                        "indicate that an element is recently marked as non null, whereas in the documentation stubs we'll " +
+                        "just list this as @NonNull. Another difference is that @doconly elements are included in " +
+                        "documentation stubs, but not regular stubs, etc.",
+                ARG_KOTLIN_STUBS,
+                "[CURRENTLY EXPERIMENTAL] If specified, stubs generated from Kotlin source code will " +
+                        "be written in Kotlin rather than the Java programming language.",
+                ARG_INCLUDE_ANNOTATIONS, "Include annotations such as @Nullable in the stub files.",
+                ARG_EXCLUDE_ALL_ANNOTATIONS, "Exclude annotations such as @Nullable from the stub files; the default.",
+                "$ARG_PASS_THROUGH_ANNOTATION <annotation classes>",
+                "A comma separated list of fully qualified names of " +
+                        "annotation classes that must be passed through unchanged.",
+                "$ARG_EXCLUDE_ANNOTATION <annotation classes>",
+                "A comma separated list of fully qualified names of " +
+                        "annotation classes that must be stripped from metalava's outputs.",
+                ARG_ENHANCE_DOCUMENTATION,
+                "Enhance documentation in various ways, for example auto-generating documentation based on source " +
+                        "annotations present in the code. This is implied by --doc-stubs.",
+                ARG_EXCLUDE_DOCUMENTATION_FROM_STUBS,
+                "Exclude element documentation (javadoc and kdoc) " +
+                        "from the generated stubs. (Copyright notices are not affected by this, they are always included. " +
+                        "Documentation stubs (--doc-stubs) are not affected.)",
+                "$ARG_STUBS_SOURCE_LIST <file>",
+                "Write the list of generated stub files into the given source " +
+                        "list file. If generating documentation stubs and you haven't also specified " +
+                        "$ARG_DOC_STUBS_SOURCE_LIST, this list will refer to the documentation stubs; " +
+                        "otherwise it's the non-documentation stubs.",
+                "$ARG_DOC_STUBS_SOURCE_LIST <file>",
+                "Write the list of generated doc stub files into the given source " +
+                        "list file",
 
-            "", "\nDiffs and Checks:",
-            "$ARG_INPUT_KOTLIN_NULLS[=yes|no]",
-            "Whether the signature file being read should be " +
-                "interpreted as having encoded its types using Kotlin style types: a suffix of \"?\" for nullable " +
-                "types, no suffix for non nullable types, and \"!\" for unknown. The default is no.",
-            "--check-compatibility:type:released <file>",
-            "Check compatibility. Type is one of 'api' " +
-                "and 'removed', which checks either the public api or the removed api.",
-            "$ARG_CHECK_COMPATIBILITY_BASE_API <file>",
-            "When performing a compat check, use the provided signature " +
-                "file as a base api, which is treated as part of the API being checked. This allows us to compute the " +
-                "full API surface from a partial API surface (e.g. the current @SystemApi txt file), which allows us to " +
-                "recognize when an API is moved from the partial API to the base API and avoid incorrectly flagging this " +
-                "as an API removal.",
-            "$ARG_API_LINT [api file]",
-            "Check API for Android API best practices. If a signature file is " +
-                "provided, only the APIs that are new since the API will be checked.",
-            "$ARG_API_LINT_IGNORE_PREFIX [prefix]",
-            "A list of package prefixes to ignore API issues in " +
-                "when running with $ARG_API_LINT.",
-            "$ARG_MIGRATE_NULLNESS <api file>",
-            "Compare nullness information with the previous stable API " +
-                "and mark newly annotated APIs as under migration.",
-            ARG_WARNINGS_AS_ERRORS, "Promote all warnings to errors",
-            ARG_LINTS_AS_ERRORS, "Promote all API lint warnings to errors",
-            "$ARG_ERROR <id>", "Report issues of the given id as errors",
-            "$ARG_WARNING <id>", "Report issues of the given id as warnings",
-            "$ARG_LINT <id>", "Report issues of the given id as having lint-severity",
-            "$ARG_HIDE <id>", "Hide/skip issues of the given id",
-            "$ARG_REPORT_EVEN_IF_SUPPRESSED <file>", "Write all issues into the given file, even if suppressed (via annotation or baseline) but not if hidden (by '$ARG_HIDE')",
-            "$ARG_BASELINE <file>",
-            "Filter out any errors already reported in the given baseline file, or " +
-                "create if it does not already exist",
-            "$ARG_UPDATE_BASELINE [file]",
-            "Rewrite the existing baseline file with the current set of warnings. " +
-                "If some warnings have been fixed, this will delete them from the baseline files. If a file " +
-                "is provided, the updated baseline is written to the given file; otherwise the original source " +
-                "baseline file is updated.",
-            "$ARG_BASELINE_API_LINT <file> $ARG_UPDATE_BASELINE_API_LINT [file]",
-            "Same as $ARG_BASELINE and " +
-                "$ARG_UPDATE_BASELINE respectively, but used specifically for API lint issues performed by " +
-                "$ARG_API_LINT.",
-            "$ARG_BASELINE_CHECK_COMPATIBILITY_RELEASED <file> $ARG_UPDATE_BASELINE_CHECK_COMPATIBILITY_RELEASED [file]",
-            "Same as $ARG_BASELINE and " +
-                "$ARG_UPDATE_BASELINE respectively, but used specifically for API compatibility issues performed by " +
-                "$ARG_CHECK_COMPATIBILITY_API_RELEASED and $ARG_CHECK_COMPATIBILITY_REMOVED_RELEASED.",
-            "$ARG_MERGE_BASELINE [file]",
-            "Like $ARG_UPDATE_BASELINE, but instead of always replacing entries " +
-                "in the baseline, it will merge the existing baseline with the new baseline. This is useful " +
-                "if $PROGRAM_NAME runs multiple times on the same source tree with different flags at different " +
-                "times, such as occasionally with $ARG_API_LINT.",
-            ARG_PASS_BASELINE_UPDATES,
-            "Normally, encountering error will fail the build, even when updating " +
-                "baselines. This flag allows you to tell $PROGRAM_NAME to continue without errors, such that " +
-                "all the baselines in the source tree can be updated in one go.",
-            ARG_DELETE_EMPTY_BASELINES,
-            "Whether to delete baseline files if they are updated and there is nothing " +
-                "to include.",
-            "$ARG_ERROR_MESSAGE_API_LINT <message>", "If set, $PROGRAM_NAME shows it when errors are detected in $ARG_API_LINT.",
-            "$ARG_ERROR_MESSAGE_CHECK_COMPATIBILITY_RELEASED <message>",
-            "If set, $PROGRAM_NAME shows it " +
-                "when errors are detected in $ARG_CHECK_COMPATIBILITY_API_RELEASED and $ARG_CHECK_COMPATIBILITY_REMOVED_RELEASED.",
+                "", "\nDiffs and Checks:",
+                "$ARG_INPUT_KOTLIN_NULLS[=yes|no]",
+                "Whether the signature file being read should be " +
+                        "interpreted as having encoded its types using Kotlin style types: a suffix of \"?\" for nullable " +
+                        "types, no suffix for non nullable types, and \"!\" for unknown. The default is no.",
+                "--check-compatibility:type:released <file>",
+                "Check compatibility. Type is one of 'api' " +
+                        "and 'removed', which checks either the public api or the removed api.",
+                "$ARG_CHECK_COMPATIBILITY_BASE_API <file>",
+                "When performing a compat check, use the provided signature " +
+                        "file as a base api, which is treated as part of the API being checked. This allows us to compute the " +
+                        "full API surface from a partial API surface (e.g. the current @SystemApi txt file), which allows us to " +
+                        "recognize when an API is moved from the partial API to the base API and avoid incorrectly flagging this " +
+                        "as an API removal.",
+                "$ARG_API_LINT [api file]",
+                "Check API for Android API best practices. If a signature file is " +
+                        "provided, only the APIs that are new since the API will be checked.",
+                "$ARG_API_LINT_IGNORE_PREFIX [prefix]",
+                "A list of package prefixes to ignore API issues in " +
+                        "when running with $ARG_API_LINT.",
+                "$ARG_MIGRATE_NULLNESS <api file>",
+                "Compare nullness information with the previous stable API " +
+                        "and mark newly annotated APIs as under migration.",
+                ARG_WARNINGS_AS_ERRORS, "Promote all warnings to errors",
+                ARG_LINTS_AS_ERRORS, "Promote all API lint warnings to errors",
+                "$ARG_ERROR <id>", "Report issues of the given id as errors",
+                "$ARG_WARNING <id>", "Report issues of the given id as warnings",
+                "$ARG_LINT <id>", "Report issues of the given id as having lint-severity",
+                "$ARG_HIDE <id>", "Hide/skip issues of the given id",
+                "$ARG_REPORT_EVEN_IF_SUPPRESSED <file>", "Write all issues into the given file, even if suppressed (via annotation or baseline) but not if hidden (by '$ARG_HIDE')",
+                "$ARG_BASELINE <file>",
+                "Filter out any errors already reported in the given baseline file, or " +
+                        "create if it does not already exist",
+                "$ARG_UPDATE_BASELINE [file]",
+                "Rewrite the existing baseline file with the current set of warnings. " +
+                        "If some warnings have been fixed, this will delete them from the baseline files. If a file " +
+                        "is provided, the updated baseline is written to the given file; otherwise the original source " +
+                        "baseline file is updated.",
+                "$ARG_BASELINE_API_LINT <file> $ARG_UPDATE_BASELINE_API_LINT [file]",
+                "Same as $ARG_BASELINE and " +
+                        "$ARG_UPDATE_BASELINE respectively, but used specifically for API lint issues performed by " +
+                        "$ARG_API_LINT.",
+                "$ARG_BASELINE_CHECK_COMPATIBILITY_RELEASED <file> $ARG_UPDATE_BASELINE_CHECK_COMPATIBILITY_RELEASED [file]",
+                "Same as $ARG_BASELINE and " +
+                        "$ARG_UPDATE_BASELINE respectively, but used specifically for API compatibility issues performed by " +
+                        "$ARG_CHECK_COMPATIBILITY_API_RELEASED and $ARG_CHECK_COMPATIBILITY_REMOVED_RELEASED.",
+                "$ARG_MERGE_BASELINE [file]",
+                "Like $ARG_UPDATE_BASELINE, but instead of always replacing entries " +
+                        "in the baseline, it will merge the existing baseline with the new baseline. This is useful " +
+                        "if $PROGRAM_NAME runs multiple times on the same source tree with different flags at different " +
+                        "times, such as occasionally with $ARG_API_LINT.",
+                ARG_PASS_BASELINE_UPDATES,
+                "Normally, encountering error will fail the build, even when updating " +
+                        "baselines. This flag allows you to tell $PROGRAM_NAME to continue without errors, such that " +
+                        "all the baselines in the source tree can be updated in one go.",
+                ARG_DELETE_EMPTY_BASELINES,
+                "Whether to delete baseline files if they are updated and there is nothing " +
+                        "to include.",
+                "$ARG_ERROR_MESSAGE_API_LINT <message>", "If set, $PROGRAM_NAME shows it when errors are detected in $ARG_API_LINT.",
+                "$ARG_ERROR_MESSAGE_CHECK_COMPATIBILITY_RELEASED <message>",
+                "If set, $PROGRAM_NAME shows it " +
+                        "when errors are detected in $ARG_CHECK_COMPATIBILITY_API_RELEASED and $ARG_CHECK_COMPATIBILITY_REMOVED_RELEASED.",
 
-            "", "\nJDiff:",
-            "$ARG_XML_API <file>", "Like $ARG_API, but emits the API in the JDiff XML format instead",
-            "$ARG_CONVERT_TO_JDIFF <sig> <xml>",
-            "Reads in the given signature file, and writes it out " +
-                "in the JDiff XML format. Can be specified multiple times.",
-            "$ARG_CONVERT_NEW_TO_JDIFF <old> <new> <xml>",
-            "Reads in the given old and new api files, " +
-                "computes the difference, and writes out only the new parts of the API in the JDiff XML format.",
+                "", "\nJDiff:",
+                "$ARG_XML_API <file>", "Like $ARG_API, but emits the API in the JDiff XML format instead",
+                "$ARG_CONVERT_TO_JDIFF <sig> <xml>",
+                "Reads in the given signature file, and writes it out " +
+                        "in the JDiff XML format. Can be specified multiple times.",
+                "$ARG_CONVERT_NEW_TO_JDIFF <old> <new> <xml>",
+                "Reads in the given old and new api files, " +
+                        "computes the difference, and writes out only the new parts of the API in the JDiff XML format.",
 
-            "", "\nExtracting Annotations:",
-            "$ARG_EXTRACT_ANNOTATIONS <zipfile>",
-            "Extracts source annotations from the source files and writes " +
-                "them into the given zip file",
-            "$ARG_FORCE_CONVERT_TO_WARNING_NULLABILITY_ANNOTATIONS <package1:-package2:...>",
-            "On every API declared " +
-                "in a class referenced by the given filter, makes nullability issues appear to callers as warnings " +
-                "rather than errors by replacing @Nullable/@NonNull in these APIs with " +
-                "@RecentlyNullable/@RecentlyNonNull",
-            "$ARG_COPY_ANNOTATIONS <source> <dest>",
-            "For a source folder full of annotation " +
-                "sources, generates corresponding package private versions of the same annotations.",
-            ARG_INCLUDE_SOURCE_RETENTION,
-            "If true, include source-retention annotations in the stub files. Does " +
-                "not apply to signature files. Source retention annotations are extracted into the external " +
-                "annotations files instead.",
-            "", "\nInjecting API Levels:",
-            "$ARG_APPLY_API_LEVELS <api-versions.xml>",
-            "Reads an XML file containing API level descriptions " +
-                "and merges the information into the documentation",
+                "", "\nExtracting Annotations:",
+                "$ARG_EXTRACT_ANNOTATIONS <zipfile>",
+                "Extracts source annotations from the source files and writes " +
+                        "them into the given zip file",
+                "$ARG_FORCE_CONVERT_TO_WARNING_NULLABILITY_ANNOTATIONS <package1:-package2:...>",
+                "On every API declared " +
+                        "in a class referenced by the given filter, makes nullability issues appear to callers as warnings " +
+                        "rather than errors by replacing @Nullable/@NonNull in these APIs with " +
+                        "@RecentlyNullable/@RecentlyNonNull",
+                "$ARG_COPY_ANNOTATIONS <source> <dest>",
+                "For a source folder full of annotation " +
+                        "sources, generates corresponding package private versions of the same annotations.",
+                ARG_INCLUDE_SOURCE_RETENTION,
+                "If true, include source-retention annotations in the stub files. Does " +
+                        "not apply to signature files. Source retention annotations are extracted into the external " +
+                        "annotations files instead.",
+                "", "\nInjecting API Levels:",
+                "$ARG_APPLY_API_LEVELS <api-versions.xml>",
+                "Reads an XML file containing API level descriptions " +
+                        "and merges the information into the documentation",
 
-            "", "\nExtracting API Levels:",
-            "$ARG_GENERATE_API_LEVELS <xmlfile>",
-            "Reads android.jar SDK files and generates an XML file recording " +
-                "the API level for each class, method and field",
-            "$ARG_REMOVE_MISSING_CLASS_REFERENCES_IN_API_LEVELS",
-            "Removes references to missing classes when generating the API levels XML file. " +
-                "This can happen when generating the XML file for the non-updatable portions of " +
-                "the module-lib sdk, as those non-updatable portions can reference classes that are " +
-                "part of an updatable apex.",
-            "$ARG_ANDROID_JAR_PATTERN <pattern>",
-            "Patterns to use to locate Android JAR files. The default " +
-                "is \$ANDROID_HOME/platforms/android-%/android.jar.",
-            ARG_FIRST_VERSION, "Sets the first API level to generate an API database from; usually 1",
-            ARG_CURRENT_VERSION, "Sets the current API level of the current source code",
-            ARG_CURRENT_CODENAME, "Sets the code name for the current source code",
-            ARG_CURRENT_JAR, "Points to the current API jar, if any",
-            ARG_SDK_JAR_ROOT,
-            "Points to root of prebuilt extension SDK jars, if any. This directory is expected to " +
-                "contain snapshots of historical extension SDK versions in the form of stub jars. " +
-                "The paths should be on the format \"<int>/public/<module-name>.jar\", where <int> " +
-                "corresponds to the extension SDK version, and <module-name> to the name of the mainline module.",
-            ARG_SDK_INFO_FILE,
-            "Points to map of extension SDK APIs to include, if any. The file is a plain text file " +
-                "and describes, per extension SDK, what APIs from that extension to include in the " +
-                "file created via $ARG_GENERATE_API_LEVELS. The format of each line is one of the following: " +
-                "\"<module-name> <pattern> <ext-name> [<ext-name> [...]]\", where <module-name> is the " +
-                "name of the mainline module this line refers to, <pattern> is a common Java name prefix " +
-                "of the APIs this line refers to, and <ext-name> is a list of extension SDK names " +
-                "in which these SDKs first appeared, or \"<ext-name> <ext-id> <type>\", where " +
-                "<ext-name> is the name of an SDK, " +
-                "<ext-id> its numerical ID and <type> is one of " +
-                "\"platform\" (the Android platform SDK), " +
-                "\"platform-ext\" (an extension to the Android platform SDK), " +
-                "\"standalone\" (a separate SDK). " +
-                "Fields are separated by whitespace. " +
-                "A mainline module may be listed multiple times. " +
-                "The special pattern \"*\" refers to all APIs in the given mainline module. " +
-                "Lines beginning with # are comments.",
+                "", "\nExtracting API Levels:",
+                "$ARG_GENERATE_API_LEVELS <xmlfile>",
+                "Reads android.jar SDK files and generates an XML file recording " +
+                        "the API level for each class, method and field",
+                "$ARG_REMOVE_MISSING_CLASS_REFERENCES_IN_API_LEVELS",
+                "Removes references to missing classes when generating the API levels XML file. " +
+                        "This can happen when generating the XML file for the non-updatable portions of " +
+                        "the module-lib sdk, as those non-updatable portions can reference classes that are " +
+                        "part of an updatable apex.",
+                "$ARG_ANDROID_JAR_PATTERN <pattern>",
+                "Patterns to use to locate Android JAR files. The default " +
+                        "is \$ANDROID_HOME/platforms/android-%/android.jar.",
+                ARG_FIRST_VERSION, "Sets the first API level to generate an API database from; usually 1",
+                ARG_CURRENT_VERSION, "Sets the current API level of the current source code",
+                ARG_CURRENT_CODENAME, "Sets the code name for the current source code",
+                ARG_CURRENT_JAR, "Points to the current API jar, if any",
+                ARG_SDK_JAR_ROOT,
+                "Points to root of prebuilt extension SDK jars, if any. This directory is expected to " +
+                        "contain snapshots of historical extension SDK versions in the form of stub jars. " +
+                        "The paths should be on the format \"<int>/public/<module-name>.jar\", where <int> " +
+                        "corresponds to the extension SDK version, and <module-name> to the name of the mainline module.",
+                ARG_SDK_INFO_FILE,
+                "Points to map of extension SDK APIs to include, if any. The file is a plain text file " +
+                        "and describes, per extension SDK, what APIs from that extension to include in the " +
+                        "file created via $ARG_GENERATE_API_LEVELS. The format of each line is one of the following: " +
+                        "\"<module-name> <pattern> <ext-name> [<ext-name> [...]]\", where <module-name> is the " +
+                        "name of the mainline module this line refers to, <pattern> is a common Java name prefix " +
+                        "of the APIs this line refers to, and <ext-name> is a list of extension SDK names " +
+                        "in which these SDKs first appeared, or \"<ext-name> <ext-id> <type>\", where " +
+                        "<ext-name> is the name of an SDK, " +
+                        "<ext-id> its numerical ID and <type> is one of " +
+                        "\"platform\" (the Android platform SDK), " +
+                        "\"platform-ext\" (an extension to the Android platform SDK), " +
+                        "\"standalone\" (a separate SDK). " +
+                        "Fields are separated by whitespace. " +
+                        "A mainline module may be listed multiple times. " +
+                        "The special pattern \"*\" refers to all APIs in the given mainline module. " +
+                        "Lines beginning with # are comments.",
 
-            "", "\nSandboxing:",
-            ARG_NO_IMPLICIT_ROOT,
-            "Disable implicit root directory detection. " +
-                "Otherwise, $PROGRAM_NAME adds in source roots implied by the source files",
-            "$ARG_STRICT_INPUT_FILES <file>",
-            "Do not read files that are not explicitly specified in the command line. " +
-                "All violations are written to the given file. Reads on directories are always allowed, but " +
-                "$PROGRAM_NAME still tracks reads on directories that are not specified in the command line, " +
-                "and write them to the file.",
-            "$ARG_STRICT_INPUT_FILES_WARN <file>",
-            "Warn when files not explicitly specified on the command line are " +
-                "read. All violations are written to the given file. Reads on directories not specified in the command " +
-                "line are allowed but also logged.",
-            "$ARG_STRICT_INPUT_FILES_STACK <file>", "Same as $ARG_STRICT_INPUT_FILES but also print stacktraces.",
-            "$ARG_STRICT_INPUT_FILES_EXEMPT <files or dirs>",
-            "Used with $ARG_STRICT_INPUT_FILES. Explicitly allow " +
-                "access to files and/or directories (separated by `${File.pathSeparator}). Can also be " +
-                "@ followed by a path to a text file containing paths to the full set of files and/or directories.",
+                "", "\nSandboxing:",
+                ARG_NO_IMPLICIT_ROOT,
+                "Disable implicit root directory detection. " +
+                        "Otherwise, $PROGRAM_NAME adds in source roots implied by the source files",
+                "$ARG_STRICT_INPUT_FILES <file>",
+                "Do not read files that are not explicitly specified in the command line. " +
+                        "All violations are written to the given file. Reads on directories are always allowed, but " +
+                        "$PROGRAM_NAME still tracks reads on directories that are not specified in the command line, " +
+                        "and write them to the file.",
+                "$ARG_STRICT_INPUT_FILES_WARN <file>",
+                "Warn when files not explicitly specified on the command line are " +
+                        "read. All violations are written to the given file. Reads on directories not specified in the command " +
+                        "line are allowed but also logged.",
+                "$ARG_STRICT_INPUT_FILES_STACK <file>", "Same as $ARG_STRICT_INPUT_FILES but also print stacktraces.",
+                "$ARG_STRICT_INPUT_FILES_EXEMPT <files or dirs>",
+                "Used with $ARG_STRICT_INPUT_FILES. Explicitly allow " +
+                        "access to files and/or directories (separated by `${File.pathSeparator}). Can also be " +
+                        "@ followed by a path to a text file containing paths to the full set of files and/or directories.",
 
-            "", "\nEnvironment Variables:",
-            ENV_VAR_METALAVA_DUMP_ARGV,
-            "Set to true to have metalava emit all the arguments it was invoked with. " +
-                "Helpful when debugging or reproducing under a debugger what the build system is doing.",
-            ENV_VAR_METALAVA_PREPEND_ARGS,
-            "One or more arguments (concatenated by space) to insert into the " +
-                "command line, before the documentation flags.",
-            ENV_VAR_METALAVA_APPEND_ARGS,
-            "One or more arguments (concatenated by space) to append to the " +
-                "end of the command line, after the generate documentation flags."
+                "", "\nEnvironment Variables:",
+                ENV_VAR_METALAVA_DUMP_ARGV,
+                "Set to true to have metalava emit all the arguments it was invoked with. " +
+                        "Helpful when debugging or reproducing under a debugger what the build system is doing.",
+                ENV_VAR_METALAVA_PREPEND_ARGS,
+                "One or more arguments (concatenated by space) to insert into the " +
+                        "command line, before the documentation flags.",
+                ENV_VAR_METALAVA_APPEND_ARGS,
+                "One or more arguments (concatenated by space) to append to the " +
+                        "end of the command line, after the generate documentation flags."
         )
 
         val sb = StringBuilder(INDENT_WIDTH)
@@ -2297,23 +2336,23 @@ class Options(
                 }
             } else {
                 val output =
-                    if (colorize) {
-                        val colorArg = bold(arg)
-                        val invisibleChars = colorArg.length - arg.length
-                        // +invisibleChars: the extra chars in the above are counted but don't contribute to width
-                        // so allow more space
-                        val colorFormatString = "%1$-" + (INDENT_WIDTH + invisibleChars) + "s%2\$s"
+                        if (colorize) {
+                            val colorArg = bold(arg)
+                            val invisibleChars = colorArg.length - arg.length
+                            // +invisibleChars: the extra chars in the above are counted but don't contribute to width
+                            // so allow more space
+                            val colorFormatString = "%1$-" + (INDENT_WIDTH + invisibleChars) + "s%2\$s"
 
-                        wrap(
-                            String.format(colorFormatString, colorArg, description),
-                            MAX_LINE_WIDTH + invisibleChars, MAX_LINE_WIDTH, indent
-                        )
-                    } else {
-                        wrap(
-                            String.format(formatString, arg, description),
-                            MAX_LINE_WIDTH, indent
-                        )
-                    }
+                            wrap(
+                                    String.format(colorFormatString, colorArg, description),
+                                    MAX_LINE_WIDTH + invisibleChars, MAX_LINE_WIDTH, indent
+                            )
+                        } else {
+                            wrap(
+                                    String.format(formatString, arg, description),
+                                    MAX_LINE_WIDTH, indent
+                            )
+                        }
 
                 // Remove trailing whitespace
                 val lines = output.lines()
@@ -2330,9 +2369,9 @@ class Options(
 
     companion object {
         private fun setIssueSeverity(
-            id: String,
-            severity: Severity,
-            arg: String
+                id: String,
+                severity: Severity,
+                arg: String
         ) {
             if (id.contains(",")) { // Handle being passed in multiple comma separated id's
                 id.split(",").forEach {
@@ -2341,13 +2380,13 @@ class Options(
                 return
             }
             val issue = Issues.findIssueById(id)
-                ?: Issues.findIssueByIdIgnoringCase(id)?.also {
-                    reporter.report(
-                        Issues.DEPRECATED_OPTION, null as File?,
-                        "Case-insensitive issue matching is deprecated, use " +
-                            "$arg ${it.name} instead of $arg $id"
-                    )
-                } ?: throw DriverException("Unknown issue id: $arg $id")
+                    ?: Issues.findIssueByIdIgnoringCase(id)?.also {
+                        reporter.report(
+                                Issues.DEPRECATED_OPTION, null as File?,
+                                "Case-insensitive issue matching is deprecated, use " +
+                                        "$arg ${it.name} instead of $arg $id"
+                        )
+                    } ?: throw DriverException("Unknown issue id: $arg $id")
 
             defaultConfiguration.setSeverity(issue, severity)
         }

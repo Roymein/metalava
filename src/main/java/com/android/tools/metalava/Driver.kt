@@ -59,7 +59,7 @@ import kotlin.text.Charsets.UTF_8
 
 const val PROGRAM_NAME = "metalava"
 const val HELP_PROLOGUE = "$PROGRAM_NAME extracts metadata from source code to generate artifacts such as the " +
-    "signature files, the SDK stub files, external annotations etc."
+        "signature files, the SDK stub files, external annotations etc."
 const val PACKAGE_HTML = "package.html"
 const val OVERVIEW_HTML = "overview.html"
 
@@ -80,14 +80,14 @@ internal var hasFileReadViolations = false
 
 /**
  * The metadata driver is a command line interface to extracting various metadata
- * from a source tree (or existing signature files etc). Run with --help to see
+ * from a source tree (or existing signature files etc.). Run with --help to see
  * more details.
  */
 fun run(
-    originalArgs: Array<String>,
-    stdout: PrintWriter = PrintWriter(OutputStreamWriter(System.out)),
-    stderr: PrintWriter = PrintWriter(OutputStreamWriter(System.err)),
-    setExitCode: Boolean = false
+        originalArgs: Array<String>,
+        stdout: PrintWriter = PrintWriter(OutputStreamWriter(System.out)),
+        stderr: PrintWriter = PrintWriter(OutputStreamWriter(System.err)),
+        setExitCode: Boolean = false
 ): Boolean {
     var exitCode = 0
 
@@ -126,7 +126,11 @@ fun run(
         stdout.flush()
         stderr.flush()
 
-        val prefix = if (e.exitCode != 0) { "Aborting: " } else { "" }
+        val prefix = if (e.exitCode != 0) {
+            "Aborting: "
+        } else {
+            ""
+        }
 
         if (e.stderr.isNotBlank()) {
             stderr.println("\n${prefix}${e.stderr}")
@@ -235,21 +239,21 @@ private fun processFlags() {
 
     val sources = options.sources
     val codebase =
-        if (sources.isNotEmpty() && sources[0].path.endsWith(DOT_TXT)) {
-            // Make sure all the source files have .txt extensions.
-            sources.firstOrNull { !it.path.endsWith(DOT_TXT) }?. let {
-                throw DriverException("Inconsistent input file types: The first file is of $DOT_TXT, but detected different extension in ${it.path}")
+            if (sources.isNotEmpty() && sources[0].path.endsWith(DOT_TXT)) {
+                // Make sure all the source files have .txt extensions.
+                sources.firstOrNull { !it.path.endsWith(DOT_TXT) }?.let {
+                    throw DriverException("Inconsistent input file types: The first file is of $DOT_TXT, but detected different extension in ${it.path}")
+                }
+                SignatureFileLoader.loadFiles(sources, options.inputKotlinStyleNulls)
+            } else if (options.apiJar != null) {
+                loadFromJarFile(options.apiJar!!)
+            } else if (sources.size == 1 && sources[0].path.endsWith(DOT_JAR)) {
+                loadFromJarFile(sources[0])
+            } else if (sources.isNotEmpty() || options.sourcePath.isNotEmpty()) {
+                loadFromSources()
+            } else {
+                return
             }
-            SignatureFileLoader.loadFiles(sources, options.inputKotlinStyleNulls)
-        } else if (options.apiJar != null) {
-            loadFromJarFile(options.apiJar!!)
-        } else if (sources.size == 1 && sources[0].path.endsWith(DOT_JAR)) {
-            loadFromJarFile(sources[0])
-        } else if (sources.isNotEmpty() || options.sourcePath.isNotEmpty()) {
-            loadFromSources()
-        } else {
-            return
-        }
     options.manifest?.let { codebase.manifest = it }
 
     if (options.verbose) {
@@ -268,8 +272,8 @@ private fun processFlags() {
 
         progress("Generating API levels XML descriptor file, ${androidApiLevelXml.name}: ")
         ApiGenerator.generate(
-            apiLevelJars, options.firstApiLevel, options.currentApiLevel, options.isDeveloperPreviewBuild(),
-            androidApiLevelXml, codebase, options.sdkJarRoot, options.sdkInfoFile, options.removeMissingClassesInApiLevels
+                apiLevelJars, options.firstApiLevel, options.currentApiLevel, options.isDeveloperPreviewBuild(),
+                androidApiLevelXml, codebase, options.sdkJarRoot, options.sdkInfoFile, options.removeMissingClassesInApiLevels
         )
     }
 
@@ -290,8 +294,8 @@ private fun processFlags() {
     // Generate the documentation stubs *before* we migrate nullness information.
     options.docStubsDir?.let {
         createStubFiles(
-            it, codebase, docStubs = true,
-            writeStubList = options.docStubsSourceList != null
+                it, codebase, docStubs = true,
+                writeStubList = options.docStubsSourceList != null
         )
     }
 
@@ -336,7 +340,7 @@ private fun processFlags() {
         val dexApiEmit = memberIsNotCloned.and(apiFilter)
 
         createReportFile(
-            codebase, apiFile, "DEX API"
+                codebase, apiFile, "DEX API"
         ) { printWriter -> DexApiWriter(printWriter, dexApiEmit, apiReference) }
     }
 
@@ -344,7 +348,7 @@ private fun processFlags() {
         val apiEmit = FilterPredicate(ApiPredicate())
         val apiReference = ApiPredicate(ignoreShown = true)
         createReportFile(
-            codebase, proguard, "Proguard file"
+                codebase, proguard, "Proguard file"
         ) { printWriter -> ProguardWriter(printWriter, apiEmit, apiReference) }
     }
 
@@ -360,14 +364,14 @@ private fun processFlags() {
     val previousApiFile = options.migrateNullsFrom
     if (previousApiFile != null) {
         val previous =
-            if (previousApiFile.path.endsWith(DOT_JAR)) {
-                loadFromJarFile(previousApiFile)
-            } else {
-                SignatureFileLoader.load(
-                    file = previousApiFile,
-                    kotlinStyleNulls = options.inputKotlinStyleNulls
-                )
-            }
+                if (previousApiFile.path.endsWith(DOT_JAR)) {
+                    loadFromJarFile(previousApiFile)
+                } else {
+                    SignatureFileLoader.load(
+                            file = previousApiFile,
+                            kotlinStyleNulls = options.inputKotlinStyleNulls
+                    )
+                }
 
         // If configured, checks for newly added nullness information compared
         // to the previous stable API and marks the newly annotated elements
@@ -385,8 +389,8 @@ private fun processFlags() {
 
     options.stubsDir?.let {
         createStubFiles(
-            it, codebase, docStubs = false,
-            writeStubList = options.stubsSourceList != null
+                it, codebase, docStubs = false,
+                writeStubList = options.stubsSourceList != null
         )
     }
 
@@ -418,19 +422,19 @@ private fun processFlags() {
 fun subtractApi(codebase: Codebase, subtractApiFile: File) {
     val path = subtractApiFile.path
     val oldCodebase =
-        when {
-            path.endsWith(DOT_TXT) -> SignatureFileLoader.load(subtractApiFile)
-            path.endsWith(DOT_JAR) -> loadFromJarFile(subtractApiFile)
-            else -> throw DriverException("Unsupported $ARG_SUBTRACT_API format, expected .txt or .jar: ${subtractApiFile.name}")
-        }
+            when {
+                path.endsWith(DOT_TXT) -> SignatureFileLoader.load(subtractApiFile)
+                path.endsWith(DOT_JAR) -> loadFromJarFile(subtractApiFile)
+                else -> throw DriverException("Unsupported $ARG_SUBTRACT_API format, expected .txt or .jar: ${subtractApiFile.name}")
+            }
 
     CodebaseComparator().compare(
-        object : ComparisonVisitor() {
-            override fun compare(old: ClassItem, new: ClassItem) {
-                new.emit = false
-            }
-        },
-        oldCodebase, codebase, ApiType.ALL.getReferenceFilter()
+            object : ComparisonVisitor() {
+                override fun compare(old: ClassItem, new: ClassItem) {
+                    new.emit = false
+                }
+            },
+            oldCodebase, codebase, ApiType.ALL.getReferenceFilter()
     )
 }
 
@@ -456,8 +460,8 @@ fun processNonCodebaseFlags() {
 
     for (convert in options.convertToXmlFiles) {
         val signatureApi = SignatureFileLoader.load(
-            file = convert.fromApiFile,
-            kotlinStyleNulls = options.inputKotlinStyleNulls
+                file = convert.fromApiFile,
+                kotlinStyleNulls = options.inputKotlinStyleNulls
         )
 
         val apiType = ApiType.ALL
@@ -467,16 +471,16 @@ fun processNonCodebaseFlags() {
         val baseFile = convert.baseApiFile
 
         val outputApi =
-            if (baseFile != null) {
-                // Convert base on a diff
-                val baseApi = SignatureFileLoader.load(
-                    file = baseFile,
-                    kotlinStyleNulls = options.inputKotlinStyleNulls
-                )
-                TextCodebase.computeDelta(baseFile, baseApi, signatureApi)
-            } else {
-                signatureApi
-            }
+                if (baseFile != null) {
+                    // Convert base on a diff
+                    val baseApi = SignatureFileLoader.load(
+                            file = baseFile,
+                            kotlinStyleNulls = options.inputKotlinStyleNulls
+                    )
+                    TextCodebase.computeDelta(baseFile, baseApi, signatureApi)
+                } else {
+                    signatureApi
+                }
 
         // See JDiff's XMLToAPI#nameAPI
         val apiName = convert.outputFile.nameWithoutExtension.replace(' ', '_')
@@ -491,21 +495,21 @@ fun processNonCodebaseFlags() {
  * signature file.
  */
 fun checkCompatibility(
-    newCodebase: Codebase,
-    check: CheckRequest
+        newCodebase: Codebase,
+        check: CheckRequest
 ) {
     progress("Checking API compatibility ($check): ")
     val signatureFile = check.file
 
     val oldCodebase =
-        if (signatureFile.path.endsWith(DOT_JAR)) {
-            loadFromJarFile(signatureFile)
-        } else {
-            SignatureFileLoader.load(
-                file = signatureFile,
-                kotlinStyleNulls = options.inputKotlinStyleNulls
-            )
-        }
+            if (signatureFile.path.endsWith(DOT_JAR)) {
+                loadFromJarFile(signatureFile)
+            } else {
+                SignatureFileLoader.load(
+                        file = signatureFile,
+                        kotlinStyleNulls = options.inputKotlinStyleNulls
+                )
+            }
 
     if (oldCodebase is TextCodebase && oldCodebase.format > FileFormat.V1 && options.outputFormat == FileFormat.V1) {
         throw DriverException("Cannot perform compatibility check of signature file $signatureFile in format ${oldCodebase.format} without analyzing current codebase with $ARG_FORMAT=${oldCodebase.format}")
@@ -524,16 +528,16 @@ fun checkCompatibility(
         val baseApiFile = options.baseApiForCompatCheck
         if (baseApiFile != null) {
             baseApi = SignatureFileLoader.load(
-                file = baseApiFile,
-                kotlinStyleNulls = options.inputKotlinStyleNulls
+                    file = baseApiFile,
+                    kotlinStyleNulls = options.inputKotlinStyleNulls
             )
         }
     } else if (options.baseApiForCompatCheck != null) {
         // This option does not make sense with showAnnotation, as the "base" in that case
         // is the non-annotated APIs.
         throw DriverException(
-            ARG_CHECK_COMPATIBILITY_BASE_API +
-                " is not compatible with --showAnnotation."
+                ARG_CHECK_COMPATIBILITY_BASE_API +
+                        " is not compatible with --showAnnotation."
         )
     }
 
@@ -612,14 +616,14 @@ private fun loadFromSources(): Codebase {
         // See if we should provide a previous codebase to provide a delta from?
         val previousApiFile = options.checkApiBaselineApiFile
         val previous =
-            when {
-                previousApiFile == null -> null
-                previousApiFile.path.endsWith(DOT_JAR) -> loadFromJarFile(previousApiFile)
-                else -> SignatureFileLoader.load(
-                    file = previousApiFile,
-                    kotlinStyleNulls = options.inputKotlinStyleNulls
-                )
-            }
+                when {
+                    previousApiFile == null -> null
+                    previousApiFile.path.endsWith(DOT_JAR) -> loadFromJarFile(previousApiFile)
+                    else -> SignatureFileLoader.load(
+                            file = previousApiFile,
+                            kotlinStyleNulls = options.inputKotlinStyleNulls
+                    )
+                }
         val apiLintReporter = options.reporterApiLint
         ApiLint.check(codebase, previous, apiLintReporter)
         progress("$PROGRAM_NAME ran api-lint in ${localTimer.elapsed(SECONDS)} seconds with ${apiLintReporter.getBaselineDescription()}")
@@ -645,13 +649,13 @@ private fun loadFromSources(): Codebase {
  * [options].
  */
 internal fun parseSources(
-    sources: List<File>,
-    description: String,
-    sourcePath: List<File> = options.sourcePath,
-    classpath: List<File> = options.classpath,
-    javaLanguageLevel: LanguageLevel = options.javaLanguageLevel,
-    kotlinLanguageLevel: LanguageVersionSettings = options.kotlinLanguageLevel,
-    manifest: File? = options.manifest
+        sources: List<File>,
+        description: String,
+        sourcePath: List<File> = options.sourcePath,
+        classpath: List<File> = options.classpath,
+        javaLanguageLevel: LanguageLevel = options.javaLanguageLevel,
+        kotlinLanguageLevel: LanguageVersionSettings = options.kotlinLanguageLevel,
+        manifest: File? = options.manifest
 ): PsiBasedCodebase {
     val sourceRoots = mutableListOf<File>()
     sourcePath.filterTo(sourceRoots) { it.path.isNotBlank() }
@@ -726,22 +730,22 @@ private fun createProjectEnvironment(config: UastEnvironment.Configuration): Uas
     uastEnvironments.add(environment)
 
     if (!assertionsEnabled() &&
-        System.getenv(ENV_VAR_METALAVA_DUMP_ARGV) == null &&
-        !isUnderTest()
+            System.getenv(ENV_VAR_METALAVA_DUMP_ARGV) == null &&
+            !isUnderTest()
     ) {
         DefaultLogger.disableStderrDumping(environment.ideaProject)
     }
 
     // Missing service needed in metalava but not in lint: javadoc handling
     environment.ideaProject.registerService(
-        com.intellij.psi.javadoc.JavadocManager::class.java,
-        com.intellij.psi.impl.source.javadoc.JavadocManagerImpl::class.java
+            com.intellij.psi.javadoc.JavadocManager::class.java,
+            com.intellij.psi.impl.source.javadoc.JavadocManagerImpl::class.java
     )
     CoreApplicationEnvironment.registerExtensionPoint(
-        environment.ideaProject.extensionArea, JavadocTagInfo.EP_NAME, JavadocTagInfo::class.java
+            environment.ideaProject.extensionArea, JavadocTagInfo.EP_NAME, JavadocTagInfo::class.java
     )
     CoreApplicationEnvironment.registerApplicationExtensionPoint(
-        CustomJavadocTagProvider.EP_NAME, CustomJavadocTagProvider::class.java
+            CustomJavadocTagProvider.EP_NAME, CustomJavadocTagProvider::class.java
     )
 
     return environment
@@ -774,8 +778,8 @@ private fun extractAnnotations(codebase: Codebase, file: File) {
     options.externalAnnotations?.let { outputFile ->
         @Suppress("UNCHECKED_CAST")
         ExtractAnnotations(
-            codebase,
-            outputFile
+                codebase,
+                outputFile
         ).extractAnnotations()
         if (options.verbose) {
             progress("$PROGRAM_NAME extracted annotations into $file in ${localTimer.elapsed(SECONDS)} seconds\n")
@@ -787,9 +791,9 @@ private fun createStubFiles(stubDir: File, codebase: Codebase, docStubs: Boolean
     if (codebase is TextCodebase) {
         if (options.verbose) {
             options.stdout.println(
-                "Generating stubs from text based codebase is an experimental feature. " +
-                    "It is not guaranteed that stubs generated from text based codebase are " +
-                    "class level equivalent to the stubs generated from source files. "
+                    "Generating stubs from text based codebase is an experimental feature. " +
+                            "It is not guaranteed that stubs generated from text based codebase are " +
+                            "class level equivalent to the stubs generated from source files. "
             )
         }
     }
@@ -808,13 +812,13 @@ private fun createStubFiles(stubDir: File, codebase: Codebase, docStubs: Boolean
     val localTimer = Stopwatch.createStarted()
 
     val stubWriter =
-        StubWriter(
-            codebase = codebase,
-            stubsDir = stubDir,
-            generateAnnotations = options.generateAnnotations,
-            preFiltered = codebase.preFiltered,
-            docStubs = docStubs
-        )
+            StubWriter(
+                    codebase = codebase,
+                    stubsDir = stubDir,
+                    generateAnnotations = options.generateAnnotations,
+                    preFiltered = codebase.preFiltered,
+                    docStubs = docStubs
+            )
     codebase.accept(stubWriter)
 
     if (docStubs) {
@@ -842,17 +846,18 @@ private fun createStubFiles(stubDir: File, codebase: Codebase, docStubs: Boolean
     }
 
     progress(
-        "$PROGRAM_NAME wrote ${if (docStubs) "documentation" else ""} stubs directory $stubDir in ${
-        localTimer.elapsed(SECONDS)} seconds\n"
+            "$PROGRAM_NAME wrote ${if (docStubs) "documentation" else ""} stubs directory $stubDir in ${
+                localTimer.elapsed(SECONDS)
+            } seconds\n"
     )
 }
 
 fun createReportFile(
-    codebase: Codebase,
-    apiFile: File,
-    description: String?,
-    deleteEmptyFiles: Boolean = false,
-    createVisitor: (PrintWriter) -> ApiVisitor
+        codebase: Codebase,
+        apiFile: File,
+        description: String?,
+        deleteEmptyFiles: Boolean = false,
+        createVisitor: (PrintWriter) -> ApiVisitor
 ) {
     if (description != null) {
         progress("Writing $description file: ")
@@ -886,8 +891,8 @@ private fun addSourceFiles(list: MutableList<File>, file: File) {
         }
         if (java.nio.file.Files.isSymbolicLink(file.toPath())) {
             reporter.report(
-                Issues.IGNORING_SYMLINK, file,
-                "Ignoring symlink during source file discovery directory traversal"
+                    Issues.IGNORING_SYMLINK, file,
+                    "Ignoring symlink during source file discovery directory traversal"
             )
             return
         }
@@ -900,9 +905,9 @@ private fun addSourceFiles(list: MutableList<File>, file: File) {
     } else if (file.isFile) {
         when {
             file.name.endsWith(DOT_JAVA) ||
-                file.name.endsWith(DOT_KT) ||
-                file.name.equals(PACKAGE_HTML) ||
-                file.name.equals(OVERVIEW_HTML) -> list.add(file)
+                    file.name.endsWith(DOT_KT) ||
+                    file.name.equals(PACKAGE_HTML) ||
+                    file.name.equals(OVERVIEW_HTML) -> list.add(file)
         }
     }
 }
@@ -930,9 +935,11 @@ private fun gatherPackageJavadoc(sources: List<File>, sourceRoots: List<File>): 
             PACKAGE_HTML -> {
                 javadoc = true; packageComments
             }
+
             OVERVIEW_HTML -> {
                 overviewHtml
             }
+
             else -> continue
         }
         var contents = Files.asCharSource(file, UTF_8).read()
@@ -944,9 +951,9 @@ private fun gatherPackageJavadoc(sources: List<File>, sourceRoots: List<File>): 
         // name from the java file. Otherwise, guess from the directory path + source roots.
         // NOTE: This causes metalava to read files other than the ones explicitly passed to it.
         var pkg = file.parentFile?.listFiles()
-            ?.filter { it.name.endsWith(DOT_JAVA) }
-            ?.asSequence()?.mapNotNull { findPackage(it) }
-            ?.firstOrNull()
+                ?.filter { it.name.endsWith(DOT_JAVA) }
+                ?.asSequence()?.mapNotNull { findPackage(it) }
+                ?.firstOrNull()
         if (pkg == null) {
             // Strip the longest prefix source root.
             val prefix = sortedSourceRoots.firstOrNull { file.startsWith(it) }?.path ?: ""
@@ -998,10 +1005,10 @@ private fun findRoot(file: File): File? {
             return File(path.substring(0, endIndex))
         } else {
             reporter.report(
-                Issues.IO_ERROR, file,
-                "$PROGRAM_NAME was unable to determine the package name. " +
-                    "This usually means that a source file was where the directory does not seem to match the package " +
-                    "declaration; we expected the path $path to end with /${pkg.replace('.', '/') + '/' + file.name}"
+                    Issues.IO_ERROR, file,
+                    "$PROGRAM_NAME was unable to determine the package name. " +
+                            "This usually means that a source file was where the directory does not seem to match the package " +
+                            "declaration; we expected the path $path to end with /${pkg.replace('.', '/') + '/' + file.name}"
             )
         }
     }

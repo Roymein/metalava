@@ -32,46 +32,46 @@ import java.util.regex.Pattern
 class AndroidApiChecks {
     fun check(codebase: Codebase) {
         codebase.accept(object : ApiVisitor(
-            // Sort by source order such that warnings follow source line number order
-            methodComparator = MethodItem.sourceOrderComparator,
-            fieldComparator = FieldItem.comparator
+                // Sort by source order such that warnings follow source line number order
+                methodComparator = MethodItem.sourceOrderComparator,
+                fieldComparator = FieldItem.comparator
         ) {
-                override fun skip(item: Item): Boolean {
-                    // Limit the checks to the android.* namespace (except for ICU)
-                    if (item is ClassItem) {
-                        val name = item.qualifiedName()
-                        return !(name.startsWith("android.") && !name.startsWith("android.icu."))
-                    }
-                    return super.skip(item)
+            override fun skip(item: Item): Boolean {
+                // Limit the checks to the android.* namespace (except for ICU)
+                if (item is ClassItem) {
+                    val name = item.qualifiedName()
+                    return !(name.startsWith("android.") && !name.startsWith("android.icu."))
                 }
+                return super.skip(item)
+            }
 
-                override fun visitItem(item: Item) {
-                    checkTodos(item)
+            override fun visitItem(item: Item) {
+                checkTodos(item)
+            }
+
+            override fun visitMethod(method: MethodItem) {
+                checkRequiresPermission(method)
+                if (!method.isConstructor()) {
+                    checkVariable(method, "@return", "Return value of '" + method.name() + "'", method.returnType())
                 }
+            }
 
-                override fun visitMethod(method: MethodItem) {
-                    checkRequiresPermission(method)
-                    if (!method.isConstructor()) {
-                        checkVariable(method, "@return", "Return value of '" + method.name() + "'", method.returnType())
-                    }
+            override fun visitField(field: FieldItem) {
+                if (field.name().contains("ACTION")) {
+                    checkIntentAction(field)
                 }
+                checkVariable(field, null, "Field '" + field.name() + "'", field.type())
+            }
 
-                override fun visitField(field: FieldItem) {
-                    if (field.name().contains("ACTION")) {
-                        checkIntentAction(field)
-                    }
-                    checkVariable(field, null, "Field '" + field.name() + "'", field.type())
-                }
-
-                override fun visitParameter(parameter: ParameterItem) {
-                    checkVariable(
+            override fun visitParameter(parameter: ParameterItem) {
+                checkVariable(
                         parameter,
                         parameter.name(),
                         "Parameter '" + parameter.name() + "' of '" + parameter.containingMethod().name() + "'",
                         parameter.type()
-                    )
-                }
-            })
+                )
+            }
+        })
     }
 
     private var cachedDocumentation: String = ""
@@ -149,10 +149,10 @@ class AndroidApiChecks {
             val c = doc[i]
 
             if (c == '@' && (
-                isLinePrefix ||
-                    doc.startsWith("@param", i, true) ||
-                    doc.startsWith("@return", i, true)
-                )
+                            isLinePrefix ||
+                                    doc.startsWith("@param", i, true) ||
+                                    doc.startsWith("@return", i, true)
+                            )
             ) {
                 // Found it
                 end = i
@@ -195,20 +195,20 @@ class AndroidApiChecks {
                     if (perm.indexOf('.') >= 0) perm = perm.substring(perm.lastIndexOf('.') + 1)
                     if (text.contains(perm)) {
                         reporter.report(
-                            // Why is that a problem? Sometimes you want to describe
-                            // particular use cases.
-                            Issues.REQUIRES_PERMISSION, method,
-                            "Method '" + method.name() +
-                                "' documentation mentions permissions already declared by @RequiresPermission"
+                                // Why is that a problem? Sometimes you want to describe
+                                // particular use cases.
+                                Issues.REQUIRES_PERMISSION, method,
+                                "Method '" + method.name() +
+                                        "' documentation mentions permissions already declared by @RequiresPermission"
                         )
                     }
                 }
             }
         } else if (text.contains("android.Manifest.permission") || text.contains("android.permission.")) {
             reporter.report(
-                Issues.REQUIRES_PERMISSION, method,
-                "Method '" + method.name() +
-                    "' documentation mentions permissions without declaring @RequiresPermission"
+                    Issues.REQUIRES_PERMISSION, method,
+                    "Method '" + method.name() +
+                            "' documentation mentions permissions without declaring @RequiresPermission"
             )
         }
     }
@@ -225,19 +225,19 @@ class AndroidApiChecks {
         val text = field.documentation
 
         if (text.contains("Broadcast Action:") ||
-            text.contains("protected intent") && text.contains("system")
+                text.contains("protected intent") && text.contains("system")
         ) {
             if (!hasBehavior) {
                 reporter.report(
-                    Issues.BROADCAST_BEHAVIOR, field,
-                    "Field '" + field.name() + "' is missing @BroadcastBehavior"
+                        Issues.BROADCAST_BEHAVIOR, field,
+                        "Field '" + field.name() + "' is missing @BroadcastBehavior"
                 )
             }
             if (!hasSdkConstant) {
                 reporter.report(
-                    Issues.SDK_CONSTANT, field,
-                    "Field '" + field.name() +
-                        "' is missing @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)"
+                        Issues.SDK_CONSTANT, field,
+                        "Field '" + field.name() +
+                                "' is missing @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)"
                 )
             }
         }
@@ -245,19 +245,19 @@ class AndroidApiChecks {
         if (text.contains("Activity Action:")) {
             if (!hasSdkConstant) {
                 reporter.report(
-                    Issues.SDK_CONSTANT, field,
-                    "Field '" + field.name() +
-                        "' is missing @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)"
+                        Issues.SDK_CONSTANT, field,
+                        "Field '" + field.name() +
+                                "' is missing @SdkConstant(SdkConstantType.ACTIVITY_INTENT_ACTION)"
                 )
             }
         }
     }
 
     private fun checkVariable(
-        item: Item,
-        tag: String?,
-        ident: String,
-        type: TypeItem?
+            item: Item,
+            tag: String?,
+            ident: String,
+            type: TypeItem?
     ) {
         type ?: return
         if (type.toString() == "int" && constantPattern.matcher(getDocumentation(item, tag)).find()) {
@@ -266,7 +266,7 @@ class AndroidApiChecks {
                 val cls = annotation.resolve() ?: continue
                 val modifiers = cls.modifiers
                 if (modifiers.findAnnotation(SdkConstants.INT_DEF_ANNOTATION.oldName()) != null ||
-                    modifiers.findAnnotation(SdkConstants.INT_DEF_ANNOTATION.newName()) != null
+                        modifiers.findAnnotation(SdkConstants.INT_DEF_ANNOTATION.newName()) != null
                 ) {
                     // TODO: Check that all the constants listed in the documentation are included in the
                     // annotation?
@@ -277,25 +277,26 @@ class AndroidApiChecks {
 
             if (!foundTypeDef) {
                 reporter.report(
-                    Issues.INT_DEF, item,
-                    // TODO: Include source code you can paste right into the code?
-                    "$ident documentation mentions constants without declaring an @IntDef"
+                        Issues.INT_DEF, item,
+                        // TODO: Include source code you can paste right into the code?
+                        "$ident documentation mentions constants without declaring an @IntDef"
                 )
             }
         }
 
         if (nullPattern.matcher(getDocumentation(item, tag)).find() &&
-            !item.hasNullnessInfo()
+                !item.hasNullnessInfo()
         ) {
             reporter.report(
-                Issues.NULLABLE, item,
-                "$ident documentation mentions 'null' without declaring @NonNull or @Nullable"
+                    Issues.NULLABLE, item,
+                    "$ident documentation mentions 'null' without declaring @NonNull or @Nullable"
             )
         }
     }
 
     companion object {
         val constantPattern: Pattern = Pattern.compile("[A-Z]{3,}_([A-Z]{3,}|\\*)")
+
         @Suppress("SpellCheckingInspection")
         val nullPattern: Pattern = Pattern.compile("\\bnull\\b")
     }

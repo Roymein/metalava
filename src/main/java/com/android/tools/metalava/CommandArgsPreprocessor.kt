@@ -28,24 +28,24 @@ import kotlin.random.Random
 
 /**
  * Preprocess command line arguments.
- * 1. Prepend/append {@code ENV_VAR_METALAVA_PREPEND_ARGS} and {@code ENV_VAR_METALAVA_PREPEND_ARGS}
+ * 1. Prepend/append {@code [ENV_VAR_METALAVA_PREPEND_ARGS]} and {@code [ENV_VAR_METALAVA_PREPEND_ARGS]}
  * 2. Reflect --verbose to {@link options#verbose}.
  */
 internal fun preprocessArgv(args: Array<String>): Array<String> {
     val modifiedArgs =
-        if (args.isEmpty()) {
-            arrayOf("--help")
-        } else if (!isUnderTest()) {
-            val prepend = envVarToArgs(ENV_VAR_METALAVA_PREPEND_ARGS)
-            val append = envVarToArgs(ENV_VAR_METALAVA_APPEND_ARGS)
-            if (prepend.isEmpty() && append.isEmpty()) {
-                args
+            if (args.isEmpty()) {
+                arrayOf("--help")
+            } else if (!isUnderTest()) {
+                val prepend = envVarToArgs(ENV_VAR_METALAVA_PREPEND_ARGS)
+                val append = envVarToArgs(ENV_VAR_METALAVA_APPEND_ARGS)
+                if (prepend.isEmpty() && append.isEmpty()) {
+                    args
+                } else {
+                    prepend + args + append
+                }
             } else {
-                prepend + args + append
+                args
             }
-        } else {
-            args
-        }
 
     // We want to enable verbose log as soon as possible, so we cheat here and try to detect
     // --verbose and --quiet.
@@ -85,9 +85,9 @@ private fun envVarToArgs(varName: String): Array<String> {
  * If the variable is set to "script", it'll generate a "rerun" script instead.
  */
 internal fun maybeDumpArgv(
-    out: PrintWriter,
-    originalArgs: Array<String>,
-    modifiedArgs: Array<String>
+        out: PrintWriter,
+        originalArgs: Array<String>,
+        modifiedArgs: Array<String>
 ) {
     val dumpOption = System.getenv(ENV_VAR_METALAVA_DUMP_ARGV)
     if (dumpOption == null || dumpOption == VALUE_FALSE || isUnderTest()) {
@@ -106,10 +106,10 @@ internal fun maybeDumpArgv(
 }
 
 private fun dumpArgv(
-    out: PrintWriter,
-    description: String,
-    args: Array<String>,
-    fullDump: Boolean
+        out: PrintWriter,
+        description: String,
+        args: Array<String>,
+        fullDump: Boolean
 ) {
     out.println("== $description ==")
     out.println("  pwd: ${File("").absolutePath}")
@@ -141,7 +141,7 @@ private fun dumpArgv(
 /** Generate a rerun script file name minus the extension. */
 private fun createRerunScriptBaseFilename(): String {
     val timestamp = LocalDateTime.now().format(
-        DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss.SSS")
+            DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss.SSS")
     )
 
     val uniqueInt = Random.nextInt(0, Int.MAX_VALUE)
@@ -172,7 +172,7 @@ private fun generateRerunScript(stdout: PrintWriter, args: Array<String>) {
     var optFileIndex = 0
     script.printWriter().use { out ->
         out.println(
-            """
+                """
             |#!/bin/sh
             |#
             |# Auto-generated $PROGRAM_NAME rerun script
@@ -197,7 +197,7 @@ private fun generateRerunScript(stdout: PrintWriter, args: Array<String>) {
         }
 
         out.println(
-            """
+                """
             |fi
             |
             |${"$"}METALAVA_RUN_PREFIX $java "${"$"}{jvm_opts[@]}" \

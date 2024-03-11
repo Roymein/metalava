@@ -175,12 +175,12 @@ import java.util.function.Predicate
  * by the Android API council.
  */
 class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?, private val reporter: Reporter) : ApiVisitor(
-    // Sort by source order such that warnings follow source line number order
-    methodComparator = MethodItem.sourceOrderComparator,
-    fieldComparator = FieldItem.comparator,
-    ignoreShown = options.showUnannotated,
-    // No need to check "for stubs only APIs" (== "implicit" APIs)
-    includeApisForStubPurposes = false
+        // Sort by source order such that warnings follow source line number order
+        methodComparator = MethodItem.sourceOrderComparator,
+        fieldComparator = FieldItem.comparator,
+        ignoreShown = options.showUnannotated,
+        // No need to check "for stubs only APIs" (== "implicit" APIs)
+        includeApisForStubPurposes = false
 ) {
     private fun report(id: Issue, item: Item, message: String, element: PsiElement? = null) {
         // Don't flag api warnings on deprecated APIs; these are obviously already known to
@@ -206,12 +206,12 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         if (oldCodebase != null) {
             // Only check the new APIs
             CodebaseComparator().compare(
-                object : ComparisonVisitor() {
-                    override fun added(new: Item) {
-                        new.accept(this@ApiLint)
-                    }
-                },
-                oldCodebase, codebase, filterReference
+                    object : ComparisonVisitor() {
+                        override fun added(new: Item) {
+                            new.accept(this@ApiLint)
+                        }
+                    },
+                    oldCodebase, codebase, filterReference
             )
         } else {
             // No previous codebase to compare with: visit the whole thing
@@ -221,9 +221,9 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
     override fun skip(item: Item): Boolean {
         return super.skip(item) ||
-            item is ClassItem && !isInteresting(item) ||
-            item is MethodItem && !isInteresting(item.containingClass()) ||
-            item is FieldItem && !isInteresting(item.containingClass())
+                item is ClassItem && !isInteresting(item) ||
+                item is MethodItem && !isInteresting(item.containingClass()) ||
+                item is FieldItem && !isInteresting(item.containingClass())
     }
 
     private val kotlinInterop = KotlinInteropChecks(reporter)
@@ -271,13 +271,13 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     }
 
     private fun checkClass(
-        cls: ClassItem,
-        methods: Sequence<MethodItem>,
-        constructors: Sequence<ConstructorItem>,
-        methodsAndConstructors: Sequence<MethodItem>,
-        fields: Sequence<FieldItem>,
-        superClass: ClassItem?,
-        interfaces: Sequence<TypeItem>
+            cls: ClassItem,
+            methods: Sequence<MethodItem>,
+            constructors: Sequence<ConstructorItem>,
+            methodsAndConstructors: Sequence<MethodItem>,
+            fields: Sequence<FieldItem>,
+            superClass: ClassItem?,
+            interfaces: Sequence<TypeItem>
     ) {
         checkEquals(methods)
         checkEnums(cls)
@@ -316,7 +316,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     }
 
     private fun checkField(
-        field: FieldItem
+            field: FieldItem
     ) {
         val modifiers = field.modifiers
         if (modifiers.isStatic() && modifiers.isFinal()) {
@@ -332,8 +332,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     }
 
     private fun checkMethod(
-        method: MethodItem,
-        filterReference: Predicate<Item>
+            method: MethodItem,
+            filterReference: Predicate<Item>
     ) {
         if (!method.isConstructor()) {
             checkMethodNames(method)
@@ -360,9 +360,9 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         // Existing violations
         val containing = method.containingClass().qualifiedName()
         if (containing.startsWith("android.opengl") ||
-            containing.startsWith("android.renderscript") ||
-            containing.startsWith("android.database.sqlite.") ||
-            containing == "android.system.OsConstants"
+                containing.startsWith("android.renderscript") ||
+                containing.startsWith("android.database.sqlite.") ||
+                containing == "android.system.OsConstants"
         ) {
             return
         }
@@ -381,10 +381,12 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             first !in 'a'..'z' -> report(START_WITH_LOWER, method, "Method name must start with lowercase char: $name")
             hasAcronyms(name) -> {
                 report(
-                    ACRONYM_NAME, method,
-                    "Acronyms should not be capitalized in method names: was `$name`, should this be `${decapitalizeAcronyms(
-                        name
-                    )}`?"
+                        ACRONYM_NAME, method,
+                        "Acronyms should not be capitalized in method names: was `$name`, should this be `${
+                            decapitalizeAcronyms(
+                                    name
+                            )
+                        }`?"
                 )
             }
         }
@@ -394,9 +396,9 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         // Existing violations
         val qualifiedName = cls.qualifiedName()
         if (qualifiedName.startsWith("android.opengl") ||
-            qualifiedName.startsWith("android.renderscript") ||
-            qualifiedName.startsWith("android.database.sqlite.") ||
-            qualifiedName.startsWith("android.R.")
+                qualifiedName.startsWith("android.renderscript") ||
+                qualifiedName.startsWith("android.database.sqlite.") ||
+                qualifiedName.startsWith("android.R.")
         ) {
             return
         }
@@ -406,22 +408,26 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         when {
             first !in 'A'..'Z' -> {
                 report(
-                    START_WITH_UPPER, cls,
-                    "Class must start with uppercase char: $name"
+                        START_WITH_UPPER, cls,
+                        "Class must start with uppercase char: $name"
                 )
             }
+
             hasAcronyms(name) -> {
                 report(
-                    ACRONYM_NAME, cls,
-                    "Acronyms should not be capitalized in class names: was `$name`, should this be `${decapitalizeAcronyms(
-                        name
-                    )}`?"
+                        ACRONYM_NAME, cls,
+                        "Acronyms should not be capitalized in class names: was `$name`, should this be `${
+                            decapitalizeAcronyms(
+                                    name
+                            )
+                        }`?"
                 )
             }
+
             name.endsWith("Impl") -> {
                 report(
-                    ENDS_WITH_IMPL, cls,
-                    "Don't expose your implementation details: `$name` ends with `Impl`"
+                        ENDS_WITH_IMPL, cls,
+                        "Don't expose your implementation details: `$name` ends with `Impl`"
                 )
             }
         }
@@ -436,10 +442,10 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         // Existing violations
         val qualified = field.containingClass().qualifiedName()
         if (qualified.startsWith("android.os.Build") ||
-            qualified == "android.system.OsConstants" ||
-            qualified == "android.media.MediaCodecInfo" ||
-            qualified.startsWith("android.opengl.") ||
-            qualified.startsWith("android.R.")
+                qualified == "android.system.OsConstants" ||
+                qualified == "android.media.MediaCodecInfo" ||
+                qualified.startsWith("android.opengl.") ||
+                qualified.startsWith("android.R.")
         ) {
             return
         }
@@ -448,18 +454,18 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         if (!constantNamePattern.matches(name)) {
             val suggested = SdkVersionInfo.camelCaseToUnderlines(name).uppercase(Locale.US)
             report(
-                ALL_UPPER, field,
-                "Constant field names must be named with only upper case characters: `$qualified#$name`, should be `$suggested`?"
+                    ALL_UPPER, field,
+                    "Constant field names must be named with only upper case characters: `$qualified#$name`, should be `$suggested`?"
             )
         } else if ((name.startsWith("MIN_") || name.startsWith("MAX_")) && !field.type().isString()) {
             report(
-                MIN_MAX_CONSTANT, field,
-                "If min/max could change in future, make them dynamic methods: $qualified#$name"
+                    MIN_MAX_CONSTANT, field,
+                    "If min/max could change in future, make them dynamic methods: $qualified#$name"
             )
         } else if ((field.type().primitive || field.type().isString()) && field.initialValue(true) == null) {
             report(
-                COMPILE_TIME_CONSTANT, field,
-                "All constants must be defined at compile time: $qualified#$name"
+                    COMPILE_TIME_CONSTANT, field,
+                    "All constants must be defined at compile time: $qualified#$name"
             )
         }
     }
@@ -475,22 +481,24 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         when {
             name.endsWith("Callbacks") -> {
                 report(
-                    SINGULAR_CALLBACK, cls,
-                    "Callback class names should be singular: $name"
+                        SINGULAR_CALLBACK, cls,
+                        "Callback class names should be singular: $name"
                 )
             }
+
             name.endsWith("Observer") -> {
                 val prefix = name.removeSuffix("Observer")
                 report(
-                    CALLBACK_NAME, cls,
-                    "Class should be named ${prefix}Callback"
+                        CALLBACK_NAME, cls,
+                        "Class should be named ${prefix}Callback"
                 )
             }
+
             name.endsWith("Callback") -> {
                 if (cls.isInterface()) {
                     report(
-                        CALLBACK_INTERFACE, cls,
-                        "Callbacks must be abstract class instead of interface to enable extension in future API levels: $name"
+                            CALLBACK_INTERFACE, cls,
+                            "Callbacks must be abstract class instead of interface to enable extension in future API levels: $name"
                     )
                 }
             }
@@ -519,8 +527,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
         if (!onCallbackNamePattern.matches(methodName)) {
             report(
-                CALLBACK_METHOD_NAME, method,
-                "$kind method names must follow the on<Something> style: $methodName"
+                    CALLBACK_METHOD_NAME, method,
+                    "$kind method names must follow the on<Something> style: $methodName"
             )
         }
 
@@ -535,19 +543,19 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         if (name.endsWith("Listener")) {
             if (cls.isClass()) {
                 report(
-                    LISTENER_INTERFACE, cls,
-                    "Listeners should be an interface, or otherwise renamed Callback: $name"
+                        LISTENER_INTERFACE, cls,
+                        "Listeners should be an interface, or otherwise renamed Callback: $name"
                 )
             } else {
                 if (methods.count() == 1) {
                     val method = methods.first()
                     val methodName = method.name()
                     if (methodName.startsWith("On") &&
-                        !("${methodName}Listener").equals(cls.simpleName(), ignoreCase = true)
+                            !("${methodName}Listener").equals(cls.simpleName(), ignoreCase = true)
                     ) {
                         report(
-                            SINGLE_METHOD_INTERFACE, cls,
-                            "Single listener method name must match class name"
+                                SINGLE_METHOD_INTERFACE, cls,
+                                "Single listener method name must match class name"
                         )
                     }
                 }
@@ -556,10 +564,10 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     }
 
     private fun checkGenericCallbacks(
-        cls: ClassItem,
-        methods: Sequence<MethodItem>,
-        constructors: Sequence<ConstructorItem>,
-        fields: Sequence<FieldItem>
+            cls: ClassItem,
+            methods: Sequence<MethodItem>,
+            constructors: Sequence<ConstructorItem>,
+            fields: Sequence<FieldItem>
     ) {
         val simpleName = cls.simpleName()
         if (!simpleName.endsWith("Callback") && !simpleName.endsWith("Listener")) return
@@ -572,24 +580,24 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         if (methods.count() != 2) return
 
         fun isSingleParamCallbackMethod(method: MethodItem) =
-            method.parameters().size == 1 &&
-                method.name().startsWith("on") &&
-                !method.parameters().first().type().primitive &&
-                method.returnType().toTypeString() == Void.TYPE.name
+                method.parameters().size == 1 &&
+                        method.name().startsWith("on") &&
+                        !method.parameters().first().type().primitive &&
+                        method.returnType().toTypeString() == Void.TYPE.name
 
         if (!methods.all(::isSingleParamCallbackMethod)) return
 
         fun TypeItem.extendsThrowable() = asClass()?.extends(JAVA_LANG_THROWABLE) ?: false
         fun isErrorMethod(method: MethodItem) =
-            method.name().run { startsWith("onError") || startsWith("onFail") } &&
-                method.parameters().first().type().extendsThrowable()
+                method.name().run { startsWith("onError") || startsWith("onFail") } &&
+                        method.parameters().first().type().extendsThrowable()
 
         if (methods.count(::isErrorMethod) == 1) {
             report(
-                GENERIC_CALLBACKS,
-                cls,
-                "${cls.fullName()} can be replaced with OutcomeReceiver<R,E> (platform)" +
-                    " or suspend fun / ListenableFuture (AndroidX)."
+                    GENERIC_CALLBACKS,
+                    cls,
+                    "${cls.fullName()} can be replaced with OutcomeReceiver<R,E> (platform)" +
+                            " or suspend fun / ListenableFuture (AndroidX)."
             )
         }
     }
@@ -612,8 +620,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         }
         if (!name.startsWith("ACTION_")) {
             report(
-                INTENT_NAME, field,
-                "Intent action constant name must be ACTION_FOO: $name"
+                    INTENT_NAME, field,
+                    "Intent action constant name must be ACTION_FOO: $name"
             )
             return
         }
@@ -625,8 +633,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         val expected = prefix + "." + name.substring(7)
         if (value != expected) {
             report(
-                ACTION_VALUE, field,
-                "Inconsistent action value; expected `$expected`, was `$value`"
+                    ACTION_VALUE, field,
+                    "Inconsistent action value; expected `$expected`, was `$value`"
             )
         }
     }
@@ -647,8 +655,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         }
         if (!name.startsWith("EXTRA_")) {
             report(
-                INTENT_NAME, field,
-                "Intent extra constant name must be EXTRA_FOO: $name"
+                    INTENT_NAME, field,
+                    "Intent extra constant name must be EXTRA_FOO: $name"
             )
             return
         }
@@ -661,8 +669,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         val expected = prefix + "." + name.substring(6)
         if (value != expected) {
             report(
-                ACTION_VALUE, field,
-                "Inconsistent extra value; expected `$expected`, was `$value`"
+                    ACTION_VALUE, field,
+                    "Inconsistent extra value; expected `$expected`, was `$value`"
             )
         }
     }
@@ -681,28 +689,28 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         if ((equalsMethod == null) != (hashCodeMethod == null)) {
             val method = equalsMethod ?: hashCodeMethod!!
             report(
-                EQUALS_AND_HASH_CODE, method,
-                "Must override both equals and hashCode; missing one in ${method.containingClass().qualifiedName()}"
+                    EQUALS_AND_HASH_CODE, method,
+                    "Must override both equals and hashCode; missing one in ${method.containingClass().qualifiedName()}"
             )
         }
     }
 
     private fun isEqualsMethod(method: MethodItem): Boolean {
         return method.name() == "equals" && method.parameters().size == 1 &&
-            method.parameters()[0].type().isJavaLangObject() &&
-            !method.modifiers.isStatic()
+                method.parameters()[0].type().isJavaLangObject() &&
+                !method.modifiers.isStatic()
     }
 
     private fun isHashCodeMethod(method: MethodItem): Boolean {
         return method.name() == "hashCode" && method.parameters().isEmpty() &&
-            !method.modifiers.isStatic()
+                !method.modifiers.isStatic()
     }
 
     private fun checkParcelable(
-        cls: ClassItem,
-        methods: Sequence<MethodItem>,
-        constructors: Sequence<MethodItem>,
-        fields: Sequence<FieldItem>
+            cls: ClassItem,
+            methods: Sequence<MethodItem>,
+            constructors: Sequence<MethodItem>,
+            fields: Sequence<FieldItem>
     ) {
         if (!cls.implements("android.os.Parcelable")) {
             return
@@ -710,27 +718,27 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
         if (fields.none { it.name() == "CREATOR" }) {
             report(
-                PARCEL_CREATOR, cls,
-                "Parcelable requires a `CREATOR` field; missing in ${cls.qualifiedName()}"
+                    PARCEL_CREATOR, cls,
+                    "Parcelable requires a `CREATOR` field; missing in ${cls.qualifiedName()}"
             )
         }
         if (methods.none { it.name() == "writeToParcel" }) {
             report(
-                PARCEL_CREATOR, cls,
-                "Parcelable requires `void writeToParcel(Parcel, int)`; missing in ${cls.qualifiedName()}"
+                    PARCEL_CREATOR, cls,
+                    "Parcelable requires `void writeToParcel(Parcel, int)`; missing in ${cls.qualifiedName()}"
             )
         }
         if (methods.none { it.name() == "describeContents" }) {
             report(
-                PARCEL_CREATOR, cls,
-                "Parcelable requires `public int describeContents()`; missing in ${cls.qualifiedName()}"
+                    PARCEL_CREATOR, cls,
+                    "Parcelable requires `public int describeContents()`; missing in ${cls.qualifiedName()}"
             )
         }
 
         if (!cls.modifiers.isFinal()) {
             report(
-                PARCEL_NOT_FINAL, cls,
-                "Parcelable classes must be final: ${cls.qualifiedName()} is not final"
+                    PARCEL_NOT_FINAL, cls,
+                    "Parcelable classes must be final: ${cls.qualifiedName()} is not final"
             )
         }
 
@@ -741,8 +749,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
         if (parcelConstructor != null) {
             report(
-                PARCEL_CONSTRUCTOR, parcelConstructor,
-                "Parcelable inflation is exposed through CREATOR, not raw constructors, in ${cls.qualifiedName()}"
+                    PARCEL_CONSTRUCTOR, parcelConstructor,
+                    "Parcelable inflation is exposed through CREATOR, not raw constructors, in ${cls.qualifiedName()}"
             )
         }
     }
@@ -755,8 +763,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             }
 
             report(
-                PROTECTED_MEMBER, member,
-                "Protected ${if (member is MethodItem) "methods" else "fields"} not allowed; must be public: ${member.describe()}}"
+                    PROTECTED_MEMBER, member,
+                    "Protected ${if (member is MethodItem) "methods" else "fields"} not allowed; must be public: ${member.describe()}}"
             )
         }
     }
@@ -766,34 +774,34 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         val modifiers = field.modifiers
         if (!modifiers.isFinal()) {
             if (className !in classesWithBareFields &&
-                !className.endsWith("LayoutParams") &&
-                !className.startsWith("android.util.Mutable")
+                    !className.endsWith("LayoutParams") &&
+                    !className.startsWith("android.util.Mutable")
             ) {
                 report(
-                    MUTABLE_BARE_FIELD, field,
-                    "Bare field ${field.name()} must be marked final, or moved behind accessors if mutable"
+                        MUTABLE_BARE_FIELD, field,
+                        "Bare field ${field.name()} must be marked final, or moved behind accessors if mutable"
                 )
             }
         }
         if (!modifiers.isStatic()) {
             if (!fieldNamePattern.matches(field.name())) {
                 report(
-                    START_WITH_LOWER, field,
-                    "Non-static field ${field.name()} must be named using fooBar style"
+                        START_WITH_LOWER, field,
+                        "Non-static field ${field.name()} must be named using fooBar style"
                 )
             }
         }
         if (internalNamePattern.matches(field.name())) {
             report(
-                INTERNAL_FIELD, field,
-                "Internal field ${field.name()} must not be exposed"
+                    INTERNAL_FIELD, field,
+                    "Internal field ${field.name()} must not be exposed"
             )
         }
         if (constantNamePattern.matches(field.name()) && field.isJava()) {
             if (!modifiers.isStatic() || !modifiers.isFinal()) {
                 report(
-                    ALL_UPPER, field,
-                    "Constant ${field.name()} must be marked static final"
+                        ALL_UPPER, field,
+                        "Constant ${field.name()} must be marked static final"
                 )
             }
         }
@@ -806,8 +814,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
         if (modifiers.isFinal() && modifiers.isStatic() && type.isString() && className in settingsKeyClasses) {
             report(
-                NO_SETTINGS_PROVIDER, field,
-                "New setting keys are not allowed (Field: ${field.name()}); use getters/setters in relevant manager class"
+                    NO_SETTINGS_PROVIDER, field,
+                    "New setting keys are not allowed (Field: ${field.name()}); use getters/setters in relevant manager class"
             )
         }
     }
@@ -823,8 +831,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             }
 
             report(
-                PAIRED_REGISTRATION, method,
-                "Found ${method.name()} but not $name in ${cls.qualifiedName()}"
+                    PAIRED_REGISTRATION, method,
+                    "Found ${method.name()} but not $name in ${cls.qualifiedName()}"
             )
         }
 
@@ -841,8 +849,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 }
                 if (name.startsWith("add") || name.startsWith("remove")) {
                     report(
-                        REGISTRATION_NAME, method,
-                        "Callback methods should be named register/unregister; was $name"
+                            REGISTRATION_NAME, method,
+                            "Callback methods should be named register/unregister; was $name"
                     )
                 }
             } else if (name.endsWith("Listener")) {
@@ -855,8 +863,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 }
                 if (name.startsWith("register") || name.startsWith("unregister")) {
                     report(
-                        REGISTRATION_NAME, method,
-                        "Listener methods should be named add/remove; was $name"
+                            REGISTRATION_NAME, method,
+                            "Listener methods should be named add/remove; was $name"
                     )
                 }
             }
@@ -886,8 +894,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                         if (node.methodName == "synchronized" && node.receiver == null) {
                             val arg = node.valueArguments.firstOrNull()
                             if (arg is UThisExpression ||
-                                arg is UClassLiteralExpression ||
-                                arg is UQualifiedReferenceExpression && arg.receiver is UClassLiteralExpression
+                                    arg is UClassLiteralExpression ||
+                                    arg is UQualifiedReferenceExpression && arg.receiver is UClassLiteralExpression
                             ) {
                                 reportError(method, arg.sourcePsi ?: node.sourcePsi ?: node.javaPsi)
                             }
@@ -901,8 +909,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
                         val lock = statement.lockExpression
                         if (lock == null || lock is PsiThisExpression ||
-                            // locking on any class is visible
-                            lock is PsiClassObjectAccessExpression
+                                // locking on any class is visible
+                                lock is PsiClassObjectAccessExpression
                         ) {
                             reportError(method, lock ?: statement)
                         }
@@ -923,8 +931,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             }
 
             report(
-                INTENT_BUILDER_NAME, method,
-                "Methods creating an Intent should be named `create<Foo>Intent()`, was `$name`"
+                    INTENT_BUILDER_NAME, method,
+                    "Methods creating an Intent should be named `create<Foo>Intent()`, was `$name`"
             )
         }
     }
@@ -934,8 +942,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             fields.firstOrNull { it.name() == fieldName }?.let { field ->
                 if (field.initialValue(true) != fieldValue) {
                     report(
-                        INTERFACE_CONSTANT, field,
-                        "Inconsistent interface constant; expected '$fieldValue'`"
+                            INTERFACE_CONSTANT, field,
+                            "Inconsistent interface constant; expected '$fieldValue'`"
                     )
                 }
             }
@@ -944,8 +952,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         fun ensureContextNameSuffix(cls: ClassItem, suffix: String) {
             if (!cls.simpleName().endsWith(suffix)) {
                 report(
-                    CONTEXT_NAME_SUFFIX, cls,
-                    "Inconsistent class name; should be `<Foo>$suffix`, was `${cls.simpleName()}`"
+                        CONTEXT_NAME_SUFFIX, cls,
+                        "Inconsistent class name; should be `<Foo>$suffix`, was `${cls.simpleName()}`"
                 )
             }
         }
@@ -958,15 +966,18 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 ensureContextNameSuffix(cls, "Service")
                 ensureFieldValue(fields, "SERVICE_INTERFACE", cls.qualifiedName())
             }
+
             cls.extends("android.content.ContentProvider") -> {
                 testMethods = true
                 ensureContextNameSuffix(cls, "Provider")
                 ensureFieldValue(fields, "PROVIDER_INTERFACE", cls.qualifiedName())
             }
+
             cls.extends("android.content.BroadcastReceiver") -> {
                 testMethods = true
                 ensureContextNameSuffix(cls, "Receiver")
             }
+
             cls.extends("android.app.Activity") -> {
                 testMethods = true
                 ensureContextNameSuffix(cls, "Activity")
@@ -982,11 +993,11 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 val name = method.name()
                 if (!onCallbackNamePattern.matches(name)) {
                     val message =
-                        if (modifiers.isAbstract()) {
-                            "Methods implemented by developers should follow the on<Something> style, was `$name`"
-                        } else {
-                            "If implemented by developer, should follow the on<Something> style; otherwise consider marking final"
-                        }
+                            if (modifiers.isAbstract()) {
+                                "Methods implemented by developers should follow the on<Something> style, was `$name`"
+                            } else {
+                                "If implemented by developer, should follow the on<Something> style; otherwise consider marking final"
+                            }
                     report(ON_NAME_EXPECTED, method, message)
                 }
             }
@@ -994,10 +1005,10 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     }
 
     private fun checkBuilder(
-        cls: ClassItem,
-        methods: Sequence<MethodItem>,
-        constructors: Sequence<ConstructorItem>,
-        superClass: ClassItem?
+            cls: ClassItem,
+            methods: Sequence<MethodItem>,
+            constructors: Sequence<ConstructorItem>,
+            superClass: ClassItem?
     ) {
         if (!cls.simpleName().endsWith("Builder")) {
             return
@@ -1007,28 +1018,28 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         }
         if (cls.isTopLevelClass()) {
             report(
-                TOP_LEVEL_BUILDER, cls,
-                "Builder should be defined as inner class: ${cls.qualifiedName()}"
+                    TOP_LEVEL_BUILDER, cls,
+                    "Builder should be defined as inner class: ${cls.qualifiedName()}"
             )
         }
         if (!cls.modifiers.isFinal()) {
             report(
-                STATIC_FINAL_BUILDER, cls,
-                "Builder must be final: ${cls.qualifiedName()}"
+                    STATIC_FINAL_BUILDER, cls,
+                    "Builder must be final: ${cls.qualifiedName()}"
             )
         }
         if (!cls.modifiers.isStatic() && !cls.isTopLevelClass()) {
             report(
-                STATIC_FINAL_BUILDER, cls,
-                "Builder must be static: ${cls.qualifiedName()}"
+                    STATIC_FINAL_BUILDER, cls,
+                    "Builder must be static: ${cls.qualifiedName()}"
             )
         }
         for (constructor in constructors) {
             for (arg in constructor.parameters()) {
                 if (arg.modifiers.isNullable()) {
                     report(
-                        OPTIONAL_BUILDER_CONSTRUCTOR_ARGUMENT, arg,
-                        "Builder constructor arguments must be mandatory (i.e. not @Nullable): ${arg.describe()}"
+                            OPTIONAL_BUILDER_CONSTRUCTOR_ARGUMENT, arg,
+                            "Builder constructor arguments must be mandatory (i.e. not @Nullable): ${arg.describe()}"
                     )
                 }
             }
@@ -1045,36 +1056,36 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 continue
             } else if (name.startsWith("get") || name.startsWith("is")) {
                 report(
-                    GETTER_ON_BUILDER, method,
-                    "Getter should be on the built object, not the builder: ${method.describe()}"
+                        GETTER_ON_BUILDER, method,
+                        "Getter should be on the built object, not the builder: ${method.describe()}"
                 )
             } else if (name.startsWith("set") || name.startsWith("add") || name.startsWith("clear")) {
                 val returnType = method.returnType()
                 val returnsClassType = if (
-                    returnType is PsiTypeItem && clsType is PsiTypeItem
+                        returnType is PsiTypeItem && clsType is PsiTypeItem
                 ) {
                     clsType.isAssignableFromWithoutUnboxing(returnType)
                 } else {
                     // fallback to a limited text based check
                     val returnTypeBounds = returnType
-                        .asTypeParameter(context = method)
-                        ?.typeBounds()?.map {
-                            it.toTypeString()
-                        } ?: emptyList()
+                            .asTypeParameter(context = method)
+                            ?.typeBounds()?.map {
+                                it.toTypeString()
+                            } ?: emptyList()
                     returnTypeBounds.contains(clsType.toTypeString()) || returnType == clsType
                 }
                 if (!returnsClassType) {
                     report(
-                        SETTER_RETURNS_THIS, method,
-                        "Methods must return the builder object (return type " +
-                            "$clsType instead of $returnType): ${method.describe()}"
+                            SETTER_RETURNS_THIS, method,
+                            "Methods must return the builder object (return type " +
+                                    "$clsType instead of $returnType): ${method.describe()}"
                     )
                 }
 
                 if (method.modifiers.isNullable()) {
                     report(
-                        SETTER_RETURNS_THIS, method,
-                        "Builder setter must be @NonNull: ${method.describe()}"
+                            SETTER_RETURNS_THIS, method,
+                            "Builder setter must be @NonNull: ${method.describe()}"
                     )
                 }
                 val isBool = when (method.parameters().firstOrNull()?.type()?.toTypeString()) {
@@ -1083,7 +1094,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 }
                 val allowedGetters: Set<String>? = if (isBool && name.startsWith("set")) {
                     val pattern = goodBooleanGetterSetterPrefixes.match(
-                        name, GetterSetterPattern::setter
+                            name, GetterSetterPattern::setter
                     )!!
                     setOf("${pattern.getter}${name.removePrefix(pattern.setter)}")
                 } else {
@@ -1099,31 +1110,35 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                                     // is called addFoos() and getFoos() is right. So we allow both.
                                     listOf(nameWithoutPrefix, "${nameWithoutPrefix}es")
                                 }
+
                                 name.endsWith("sh") || name.endsWith("ch") || name.endsWith("x") ||
-                                    name.endsWith("z") -> listOf("${nameWithoutPrefix}es")
+                                        name.endsWith("z") -> listOf("${nameWithoutPrefix}es")
+
                                 name.endsWith("y") &&
-                                    name[name.length - 2] !in listOf('a', 'e', 'i', 'o', 'u')
+                                        name[name.length - 2] !in listOf('a', 'e', 'i', 'o', 'u')
                                 -> {
                                     listOf("${nameWithoutPrefix.removeSuffix("y")}ies")
                                 }
+
                                 else -> listOf("${nameWithoutPrefix}s")
                             }
                         }
+
                         else -> null
                     }?.map { "get$it" }?.toSet()
                 }
                 allowedGetters?.let { expectedGetters.add(method to it) }
             } else {
                 report(
-                    BUILDER_SET_STYLE, method,
-                    "Builder methods names should use setFoo() / addFoo() / clearFoo() style: ${method.describe()}"
+                        BUILDER_SET_STYLE, method,
+                        "Builder methods names should use setFoo() / addFoo() / clearFoo() style: ${method.describe()}"
                 )
             }
         }
         if (builtType == null) {
             report(
-                MISSING_BUILD_METHOD, cls,
-                "${cls.qualifiedName()} does not declare a `build()` method, but builder classes are expected to"
+                    MISSING_BUILD_METHOD, cls,
+                    "${cls.qualifiedName()} does not declare a `build()` method, but builder classes are expected to"
             )
         }
         builtType?.asClass()?.let { builtClass ->
@@ -1133,12 +1148,12 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                     val expectedGetterCalls = expectedGetterNames.map { "$it()" }
                     val errorString = if (expectedGetterCalls.size == 1) {
                         "${builtClass.qualifiedName()} does not declare a " +
-                            "`${expectedGetterCalls.first()}` method matching " +
-                            setter.describe()
+                                "`${expectedGetterCalls.first()}` method matching " +
+                                setter.describe()
                     } else {
                         "${builtClass.qualifiedName()} does not declare a getter method " +
-                            "matching ${setter.describe()} (expected one of: " +
-                            "$expectedGetterCalls)"
+                                "matching ${setter.describe()} (expected one of: " +
+                                "$expectedGetterCalls)"
                     }
                     report(MISSING_GETTER_MATCHING_BUILDER, setter, errorString)
                 }
@@ -1158,8 +1173,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "implements IInterface"
             }
             report(
-                RAW_AIDL, cls,
-                "Raw AIDL interfaces must not be exposed: ${cls.simpleName()} $problem"
+                    RAW_AIDL, cls,
+                    "Raw AIDL interfaces must not be exposed: ${cls.simpleName()} $problem"
             )
         }
     }
@@ -1167,16 +1182,16 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     private fun checkInternal(cls: ClassItem) {
         if (cls.qualifiedName().startsWith("com.android.")) {
             report(
-                INTERNAL_CLASSES, cls,
-                "Internal classes must not be exposed"
+                    INTERNAL_CLASSES, cls,
+                    "Internal classes must not be exposed"
             )
         }
     }
 
     private fun checkLayering(
-        cls: ClassItem,
-        methodsAndConstructors: Sequence<MethodItem>,
-        fields: Sequence<FieldItem>
+            cls: ClassItem,
+            methodsAndConstructors: Sequence<MethodItem>,
+            fields: Sequence<FieldItem>
     ) {
         fun packageRank(pkg: PackageItem): Int {
             return when (pkg.qualifiedName()) {
@@ -1231,10 +1246,12 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             val fieldTypeRank = getTypeRank(field.type())
             if (fieldTypeRank != -1 && fieldTypeRank < classRank) {
                 report(
-                    PACKAGE_LAYERING, cls,
-                    "Field type `${field.type().toTypeString()}` violates package layering: nothing in `$classPackage` should depend on `${getTypePackage(
-                        field.type()
-                    )}`"
+                        PACKAGE_LAYERING, cls,
+                        "Field type `${field.type().toTypeString()}` violates package layering: nothing in `$classPackage` should depend on `${
+                            getTypePackage(
+                                    field.type()
+                            )
+                        }`"
                 )
             }
         }
@@ -1244,10 +1261,12 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             val returnTypeRank = getTypeRank(returnType)
             if (returnTypeRank != -1 && returnTypeRank < classRank) {
                 report(
-                    PACKAGE_LAYERING, cls,
-                    "Method return type `${returnType.toTypeString()}` violates package layering: nothing in `$classPackage` should depend on `${getTypePackage(
-                        returnType
-                    )}`"
+                        PACKAGE_LAYERING, cls,
+                        "Method return type `${returnType.toTypeString()}` violates package layering: nothing in `$classPackage` should depend on `${
+                            getTypePackage(
+                                    returnType
+                            )
+                        }`"
                 )
             }
 
@@ -1255,10 +1274,12 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 val parameterTypeRank = getTypeRank(parameter.type())
                 if (parameterTypeRank != -1 && parameterTypeRank < classRank) {
                     report(
-                        PACKAGE_LAYERING, cls,
-                        "Method parameter type `${parameter.type().toTypeString()}` violates package layering: nothing in `$classPackage` should depend on `${getTypePackage(
-                            parameter.type()
-                        )}`"
+                            PACKAGE_LAYERING, cls,
+                            "Method parameter type `${parameter.type().toTypeString()}` violates package layering: nothing in `$classPackage` should depend on `${
+                                getTypePackage(
+                                        parameter.type()
+                                )
+                            }`"
                     )
                 }
             }
@@ -1289,8 +1310,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             for (method in methods) {
                 if (method.name() == actual) {
                     report(
-                        GETTER_SETTER_NAMES, method,
-                        "Symmetric method for `$trigger` must be named `$expected`; was `$actual`"
+                            GETTER_SETTER_NAMES, method,
+                            "Symmetric method for `$trigger` must be named `$expected`; was `$actual`"
                     )
                 }
             }
@@ -1334,8 +1355,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     }
 
     private fun checkCollections(
-        type: TypeItem,
-        item: Item
+            type: TypeItem,
+            item: Item
     ) {
         if (type.primitive) {
             return
@@ -1360,8 +1381,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 }
                 val erased = type.toErasedTypeString()
                 report(
-                    CONCRETE_COLLECTION, item,
-                    "$where is concrete collection (`$erased`); must be higher-level interface"
+                        CONCRETE_COLLECTION, item,
+                        "$where is concrete collection (`$erased`); must be higher-level interface"
                 )
             }
         }
@@ -1384,7 +1405,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         val superItem: Item? = when (item) {
             is MethodItem -> item.findPredicateSuperMethod(filterReference)
             is ParameterItem -> item.containingMethod().findPredicateSuperMethod(filterReference)
-                ?.parameters()?.find { it.parameterIndex == item.parameterIndex }
+                    ?.parameters()?.find { it.parameterIndex == item.parameterIndex }
+
             else -> null
         }
 
@@ -1393,12 +1415,12 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         }
 
         if (type.isArray() ||
-            typeAsClass.extendsOrImplements("java.util.Collection") ||
-            typeAsClass.extendsOrImplements("kotlin.collections.Collection") ||
-            typeAsClass.extendsOrImplements("java.util.Map") ||
-            typeAsClass.extendsOrImplements("kotlin.collections.Map") ||
-            typeAsClass.qualifiedName() == "android.os.Bundle" ||
-            typeAsClass.qualifiedName() == "android.os.PersistableBundle"
+                typeAsClass.extendsOrImplements("java.util.Collection") ||
+                typeAsClass.extendsOrImplements("kotlin.collections.Collection") ||
+                typeAsClass.extendsOrImplements("java.util.Map") ||
+                typeAsClass.extendsOrImplements("kotlin.collections.Map") ||
+                typeAsClass.qualifiedName() == "android.os.Bundle" ||
+                typeAsClass.qualifiedName() == "android.os.PersistableBundle"
         ) {
             val where = when (item) {
                 is MethodItem -> "Return type of ${item.describe()}"
@@ -1407,8 +1429,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
             val erased = type.toErasedTypeString(item)
             report(
-                NULLABLE_COLLECTION, item,
-                "$where is a nullable collection (`$erased`); must be non-null"
+                    NULLABLE_COLLECTION, item,
+                    "$where is a nullable collection (`$erased`); must be non-null"
             )
         }
     }
@@ -1426,10 +1448,12 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 if (known != null && (prev and value) != 0) {
                     val prevName = valueToFlag?.get(prev)
                     report(
-                        OVERLAPPING_CONSTANTS, field,
-                        "Found overlapping flag constant values: `$name` with value $value (0x${Integer.toHexString(
-                            value
-                        )}) and overlapping flag value $prev (0x${Integer.toHexString(prev)}) from `$prevName`"
+                            OVERLAPPING_CONSTANTS, field,
+                            "Found overlapping flag constant values: `$name` with value $value (0x${
+                                Integer.toHexString(
+                                        value
+                                )
+                            }) and overlapping flag value $prev (0x${Integer.toHexString(prev)}) from `$prevName`"
                     )
                 }
                 if (known == null) {
@@ -1448,8 +1472,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         for (exception in method.filteredThrowsTypes(filterReference)) {
             if (isUncheckedException(exception)) {
                 report(
-                    BANNED_THROW, method,
-                    "Methods must not throw unchecked exceptions"
+                        BANNED_THROW, method,
+                        "Methods must not throw unchecked exceptions"
                 )
             } else {
                 when (val qualifiedName = exception.qualifiedName()) {
@@ -1457,10 +1481,11 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                     "java.lang.Throwable",
                     "java.lang.Error" -> {
                         report(
-                            GENERIC_EXCEPTION, method,
-                            "Methods must not throw generic exceptions (`$qualifiedName`)"
+                                GENERIC_EXCEPTION, method,
+                                "Methods must not throw generic exceptions (`$qualifiedName`)"
                         )
                     }
+
                     "android.os.RemoteException" -> {
                         when (method.containingClass().qualifiedName()) {
                             "android.content.ContentProviderClient",
@@ -1468,10 +1493,11 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                             "android.os.IBinder" -> {
                                 // exceptions
                             }
+
                             else -> {
                                 report(
-                                    RETHROW_REMOTE_EXCEPTION, method,
-                                    "Methods calling system APIs should rethrow `RemoteException` as `RuntimeException` (but do not list it in the throws clause)"
+                                        RETHROW_REMOTE_EXCEPTION, method,
+                                        "Methods calling system APIs should rethrow `RemoteException` as `RuntimeException` (but do not list it in the throws clause)"
                                 )
                             }
                         }
@@ -1499,8 +1525,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         fun checkName(name: String, item: Item) {
             if (name.contains("Google", ignoreCase = true)) {
                 report(
-                    MENTIONS_GOOGLE, item,
-                    "Must never reference Google (`$name`)"
+                        MENTIONS_GOOGLE, item,
+                        "Must never reference Google (`$name`)"
                 )
             }
         }
@@ -1516,11 +1542,11 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
     private fun checkBitSet(type: TypeItem, typeString: String, item: Item) {
         if (typeString.startsWith("java.util.BitSet") &&
-            type.asClass()?.qualifiedName() == "java.util.BitSet"
+                type.asClass()?.qualifiedName() == "java.util.BitSet"
         ) {
             report(
-                HEAVY_BIT_SET, item,
-                "Type must not be heavy BitSet (${item.describe()})"
+                    HEAVY_BIT_SET, item,
+                    "Type must not be heavy BitSet (${item.describe()})"
             )
         }
     }
@@ -1533,15 +1559,15 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             method.modifiers.isPublic()
             method.modifiers.isPrivate()
             report(
-                MANAGER_CONSTRUCTOR, method,
-                "Managers must always be obtained from Context; no direct constructors"
+                    MANAGER_CONSTRUCTOR, method,
+                    "Managers must always be obtained from Context; no direct constructors"
             )
         }
         for (method in methods) {
             if (method.returnType().asClass() == cls) {
                 report(
-                    MANAGER_LOOKUP, method,
-                    "Managers must always be obtained from Context (`${method.name()}`)"
+                        MANAGER_LOOKUP, method,
+                        "Managers must always be obtained from Context (`${method.name()}`)"
                 )
             }
         }
@@ -1595,6 +1621,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                     if (item.modifiers.hasNullnessInfo()) return
                     "method `${item.name()}` return"
                 }
+
                 else -> throw IllegalStateException("Unexpected item type: $item")
             }
             report(MISSING_NULLABILITY, item, "Missing nullability on $where")
@@ -1611,6 +1638,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                         }
                     }
                 }
+
                 is MethodItem -> {
                     // We don't enforce this check on constructors
                     if (item.isConstructor()) return
@@ -1663,10 +1691,10 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             }
         } && supers.any { superMethod ->
             !(
-                superMethod.parameters().firstOrNull { param ->
-                    parameter.parameterIndex == param.parameterIndex
-                }?.hasNullnessInfo() ?: true
-                )
+                    superMethod.parameters().firstOrNull { param ->
+                        parameter.parameterIndex == param.parameterIndex
+                    }?.hasNullnessInfo() ?: true
+                    )
         }
     }
 
@@ -1682,6 +1710,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "java.lang.Short",
                 "java.lang.Boolean" ->
                     true
+
                 else ->
                     false
             }
@@ -1690,17 +1719,17 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         val qualifiedName = type.asClass()?.qualifiedName() ?: return
         if (isBoxType(qualifiedName)) {
             report(
-                AUTO_BOXING, item,
-                "Must avoid boxed primitives (`$qualifiedName`)"
+                    AUTO_BOXING, item,
+                    "Must avoid boxed primitives (`$qualifiedName`)"
             )
         }
     }
 
     private fun checkStaticUtils(
-        cls: ClassItem,
-        methods: Sequence<MethodItem>,
-        constructors: Sequence<ConstructorItem>,
-        fields: Sequence<FieldItem>
+            cls: ClassItem,
+            methods: Sequence<MethodItem>,
+            constructors: Sequence<ConstructorItem>,
+            fields: Sequence<FieldItem>
     ) {
         if (!cls.isClass()) {
             return
@@ -1718,8 +1747,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         if (hasDefaultConstructor) {
             val qualifiedName = cls.qualifiedName()
             if (qualifiedName.startsWith("android.opengl.") ||
-                qualifiedName.startsWith("android.R.") ||
-                qualifiedName == "android.R"
+                    qualifiedName.startsWith("android.R.") ||
+                    qualifiedName == "android.R"
             ) {
                 return
             }
@@ -1729,11 +1758,11 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             }
 
             if (methods.none { !it.modifiers.isStatic() } &&
-                fields.none { !it.modifiers.isStatic() }
+                    fields.none { !it.modifiers.isStatic() }
             ) {
                 report(
-                    STATIC_UTILS, cls,
-                    "Fully-static utility classes must not have constructor"
+                        STATIC_UTILS, cls,
+                        "Fully-static utility classes must not have constructor"
                 )
             }
         }
@@ -1792,15 +1821,15 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 val cluster = cluster(sig)
                 if (!cluster.containsAll(commonArgs)) {
                     report(
-                        COMMON_ARGS_FIRST, m,
-                        "Expected common arguments ${commonArgs.joinToString()}} at beginning of overloaded method ${m.describe()}"
+                            COMMON_ARGS_FIRST, m,
+                            "Expected common arguments ${commonArgs.joinToString()}} at beginning of overloaded method ${m.describe()}"
                     )
                 } else if (lockedSig == null) {
                     lockedSig = sig
                 } else if (lockedSig != sig) {
                     report(
-                        CONSISTENT_ARGUMENT_ORDER, m,
-                        "Expected consistent argument ordering between overloads: ${lockedSig.joinToString()}}"
+                            CONSISTENT_ARGUMENT_ORDER, m,
+                            "Expected consistent argument ordering between overloads: ${lockedSig.joinToString()}}"
                     )
                 }
             }
@@ -1808,16 +1837,16 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     }
 
     private fun checkCallbackHandlers(
-        cls: ClassItem,
-        methodsAndConstructors: Sequence<MethodItem>,
-        superClass: ClassItem?
+            cls: ClassItem,
+            methodsAndConstructors: Sequence<MethodItem>,
+            superClass: ClassItem?
     ) {
         fun packageContainsSegment(packageName: String?, segment: String): Boolean {
             packageName ?: return false
             return (
-                packageName.contains(segment) &&
-                    (packageName.contains(".$segment.") || packageName.endsWith(".$segment"))
-                )
+                    packageName.contains(segment) &&
+                            (packageName.contains(".$segment.") || packageName.endsWith(".$segment"))
+                    )
         }
 
         fun skipPackage(packageName: String?): Boolean {
@@ -1841,21 +1870,21 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
         // Ignore UI classes which assume main thread
         if (packageContainsSegment(classPackage, "app") ||
-            packageContainsSegment(extendsPackage, "app")
+                packageContainsSegment(extendsPackage, "app")
         ) {
             val fullName = cls.fullName()
             if (fullName.contains("ActionBar") ||
-                fullName.contains("Dialog") ||
-                fullName.contains("Application") ||
-                fullName.contains("Activity") ||
-                fullName.contains("Fragment") ||
-                fullName.contains("Loader")
+                    fullName.contains("Dialog") ||
+                    fullName.contains("Application") ||
+                    fullName.contains("Activity") ||
+                    fullName.contains("Fragment") ||
+                    fullName.contains("Loader")
             ) {
                 return
             }
         }
         if (packageContainsSegment(classPackage, "content") ||
-            packageContainsSegment(extendsPackage, "content")
+                packageContainsSegment(extendsPackage, "content")
         ) {
             val fullName = cls.fullName()
             if (fullName.contains("Loader")) {
@@ -1887,8 +1916,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             for (parameter in method.parameters()) {
                 val type = parameter.type().toTypeString()
                 if (type.endsWith("Listener") ||
-                    type.endsWith("Callback") ||
-                    type.endsWith("Callbacks")
+                        type.endsWith("Callback") ||
+                        type.endsWith("Callbacks")
                 ) {
                     found[name] = method
                 }
@@ -1912,8 +1941,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             }
             if (!takesExec) {
                 report(
-                    EXECUTOR_REGISTRATION, f,
-                    "Registration methods should have overload that accepts delivery Executor: `$name`"
+                        EXECUTOR_REGISTRATION, f,
+                        "Registration methods should have overload that accepts delivery Executor: `$name`"
                 )
             }
         }
@@ -1926,8 +1955,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 val p = parameters[i]
                 if (p.type().toTypeString() == "android.content.Context") {
                     report(
-                        CONTEXT_FIRST, p,
-                        "Context is distinct, so it must be the first argument (method `${method.name()}`)"
+                            CONTEXT_FIRST, p,
+                            "Context is distinct, so it must be the first argument (method `${method.name()}`)"
                     )
                 }
             }
@@ -1937,8 +1966,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 val p = parameters[i]
                 if (p.type().toTypeString() == "android.content.ContentResolver") {
                     report(
-                        CONTEXT_FIRST, p,
-                        "ContentResolver is distinct, so it must be the first argument (method `${method.name()}`)"
+                            CONTEXT_FIRST, p,
+                            "ContentResolver is distinct, so it must be the first argument (method `${method.name()}`)"
                     )
                 }
             }
@@ -1960,8 +1989,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                     found = true
                 } else if (found) {
                     report(
-                        LISTENER_LAST, parameter,
-                        "Listeners should always be at end of argument list (method `${method.name()}`)"
+                            LISTENER_LAST, parameter,
+                            "Listeners should always be at end of argument list (method `${method.name()}`)"
                     )
                 }
             }
@@ -2001,16 +2030,16 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                     if (name.startsWith("config_")) {
                         if (!configFieldPattern.matches(name)) {
                             report(
-                                CONFIG_FIELD_NAME, field,
-                                "Expected config name to be in the `config_fooBarBaz` style, was `$name`"
+                                    CONFIG_FIELD_NAME, field,
+                                    "Expected config name to be in the `config_fooBarBaz` style, was `$name`"
                             )
                         }
                         continue
                     }
                     if (!resourceFileFieldPattern.matches(name)) {
                         report(
-                            RESOURCE_FIELD_NAME, field,
-                            "Expected resource name in `${cls.qualifiedName()}` to be in the `foo_bar_baz` style, was `$name`"
+                                RESOURCE_FIELD_NAME, field,
+                                "Expected resource name in `${cls.qualifiedName()}` to be in the `foo_bar_baz` style, was `$name`"
                         )
                     }
                 }
@@ -2038,8 +2067,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                         continue
                     }
                     report(
-                        RESOURCE_VALUE_FIELD_NAME, field,
-                        "Expected resource name in `${cls.qualifiedName()}` to be in the `fooBarBaz` style, was `$name`"
+                            RESOURCE_VALUE_FIELD_NAME, field,
+                            "Expected resource name in `${cls.qualifiedName()}` to be in the `fooBarBaz` style, was `$name`"
                     )
                 }
             }
@@ -2049,15 +2078,15 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                     val name = field.name()
                     if (!styleFieldPattern.matches(name)) {
                         report(
-                            RESOURCE_STYLE_FIELD_NAME, field,
-                            "Expected resource name in `${cls.qualifiedName()}` to be in the `FooBar_Baz` style, was `$name`"
+                                RESOURCE_STYLE_FIELD_NAME, field,
+                                "Expected resource name in `${cls.qualifiedName()}` to be in the `FooBar_Baz` style, was `$name`"
                         )
                     }
                 }
             }
 
             STYLEABLE, // appears as R class but name check is implicitly done as part of style class check
-            // DECLARE_STYLEABLE,
+                // DECLARE_STYLEABLE,
             STYLE_ITEM,
             PUBLIC,
             SAMPLE_DATA,
@@ -2083,6 +2112,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                         }
                         set.add(method)
                     }
+
                     "java.io.FileDescriptor",
                     "android.os.ParcelFileDescriptor",
                     "java.io.InputStream",
@@ -2103,8 +2133,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             for (method in files) {
                 if (streams == null || !streams.contains(method.name())) {
                     report(
-                        STREAM_FILES, method,
-                        "Methods accepting `File` should also accept `FileDescriptor` or streams: ${method.describe()}"
+                            STREAM_FILES, method,
+                            "Methods accepting `File` should also accept `FileDescriptor` or streams: ${method.describe()}"
                     )
                 }
             }
@@ -2123,8 +2153,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             val type = returnType.toTypeString()
             if (type.startsWith("android.") && returnType.isArray()) {
                 report(
-                    PARCELABLE_LIST, method,
-                    "Methods should return `List<? extends Parcelable>` instead of `Parcelable[]` to support `ParceledListSlice` under the hood: ${method.describe()}"
+                        PARCELABLE_LIST, method,
+                        "Methods should return `List<? extends Parcelable>` instead of `Parcelable[]` to support `ParceledListSlice` under the hood: ${method.describe()}"
                 )
             }
         }
@@ -2133,8 +2163,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     private fun checkAbstractInner(cls: ClassItem) {
         if (!cls.isTopLevelClass() && cls.isClass() && cls.modifiers.isAbstract() && !cls.modifiers.isStatic()) {
             report(
-                ABSTRACT_INNER, cls,
-                "Abstract inner classes should be static to improve testability: ${cls.describe()}"
+                    ABSTRACT_INNER, cls,
+                    "Abstract inner classes should be static to improve testability: ${cls.describe()}"
             )
         }
     }
@@ -2143,14 +2173,14 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         superClass ?: return
         if (superClass.simpleName().endsWith("Error")) {
             report(
-                EXTENDS_ERROR, cls,
-                "Trouble must be reported through an `Exception`, not an `Error` (`${cls.simpleName()}` extends `${superClass.simpleName()}`)"
+                    EXTENDS_ERROR, cls,
+                    "Trouble must be reported through an `Exception`, not an `Error` (`${cls.simpleName()}` extends `${superClass.simpleName()}`)"
             )
         }
         if (superClass.simpleName().endsWith("Exception") && !cls.simpleName().endsWith("Exception")) {
             report(
-                EXCEPTION_NAME, cls,
-                "Exceptions must be named `FooException`, was `${cls.simpleName()}`"
+                    EXCEPTION_NAME, cls,
+                    "Exceptions must be named `FooException`, was `${cls.simpleName()}`"
             )
         }
     }
@@ -2169,8 +2199,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                     val badUnit = badUnits.keys.find { name.endsWith(it) }
                     val value = badUnits[badUnit]
                     report(
-                        METHOD_NAME_UNITS, method,
-                        "Expected method name units to be `$value`, was `$badUnit` in `$name`"
+                            METHOD_NAME_UNITS, method,
+                            "Expected method name units to be `$value`, was `$badUnit` in `$name`"
                     )
                 }
             }
@@ -2182,13 +2212,13 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         }
         if (name.endsWith("Fraction") && (type == "int" || type == "long" || type == "short")) {
             report(
-                FRACTION_FLOAT, method,
-                "Fractions must use floats, was `$type` in `$name`"
+                    FRACTION_FLOAT, method,
+                    "Fractions must use floats, was `$type` in `$name`"
             )
         } else if (name.endsWith("Percentage") && (type == "float" || type == "double")) {
             report(
-                PERCENTAGE_INT, method,
-                "Percentage must use ints, was `$type` in `$name`"
+                    PERCENTAGE_INT, method,
+                    "Percentage must use ints, was `$type` in `$name`"
             )
         }
     }
@@ -2210,8 +2240,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         if (foundMethods.iterator().hasNext() && !cls.implements("java.lang.AutoCloseable")) { // includes java.io.Closeable
             val foundMethodsDescriptions = foundMethods.joinToString { method -> "${method.name()}()" }
             report(
-                NOT_CLOSEABLE, cls,
-                "Classes that release resources ($foundMethodsDescriptions) should implement AutoCloseable and CloseGuard: ${cls.describe()}"
+                    NOT_CLOSEABLE, cls,
+                    "Classes that release resources ($foundMethodsDescriptions) should implement AutoCloseable and CloseGuard: ${cls.describe()}"
             )
         }
     }
@@ -2220,13 +2250,13 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         fun flagKotlinOperator(method: MethodItem, message: String) {
             if (method.isKotlin()) {
                 report(
-                    KOTLIN_OPERATOR, method,
-                    "Note that adding the `operator` keyword would allow calling this method using operator syntax"
+                        KOTLIN_OPERATOR, method,
+                        "Note that adding the `operator` keyword would allow calling this method using operator syntax"
                 )
             } else {
                 report(
-                    KOTLIN_OPERATOR, method,
-                    "$message (this is usually desirable; just make sure it makes sense for this type of object)"
+                        KOTLIN_OPERATOR, method,
+                        "$message (this is usually desirable; just make sure it makes sense for this type of object)"
                 )
             }
         }
@@ -2240,7 +2270,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "unaryPlus", "unaryMinus", "not" -> {
                     if (method.parameters().isEmpty()) {
                         flagKotlinOperator(
-                            method, "Method can be invoked as a unary operator from Kotlin: `$name`"
+                                method, "Method can be invoked as a unary operator from Kotlin: `$name`"
                         )
                     }
                 }
@@ -2248,7 +2278,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "inc", "dec" -> {
                     if (method.parameters().isEmpty() && method.returnType().toTypeString() != "void") {
                         flagKotlinOperator(
-                            method, "Method can be invoked as a pre/postfix inc/decrement operator from Kotlin: `$name`"
+                                method, "Method can be invoked as a pre/postfix inc/decrement operator from Kotlin: `$name`"
                         )
                     }
                 }
@@ -2256,20 +2286,20 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "plus", "minus", "times", "div", "rem", "mod", "rangeTo" -> {
                     if (method.parameters().size == 1) {
                         flagKotlinOperator(
-                            method, "Method can be invoked as a binary operator from Kotlin: `$name`"
+                                method, "Method can be invoked as a binary operator from Kotlin: `$name`"
                         )
                     }
                     val assignName = name + "Assign"
 
                     if (methods.any {
-                        it.name() == assignName &&
-                            it.parameters().size == 1 &&
-                            it.returnType().toTypeString() == "void"
-                    }
+                                it.name() == assignName &&
+                                        it.parameters().size == 1 &&
+                                        it.returnType().toTypeString() == "void"
+                            }
                     ) {
                         report(
-                            UNIQUE_KOTLIN_OPERATOR, method,
-                            "Only one of `$name` and `${name}Assign` methods should be present for Kotlin"
+                                UNIQUE_KOTLIN_OPERATOR, method,
+                                "Only one of `$name` and `${name}Assign` methods should be present for Kotlin"
                         )
                     }
                 }
@@ -2277,7 +2307,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "contains" -> {
                     if (method.parameters().size == 1 && method.returnType().toTypeString() == "boolean") {
                         flagKotlinOperator(
-                            method, "Method can be invoked as a \"in\" operator from Kotlin: `$name`"
+                                method, "Method can be invoked as a \"in\" operator from Kotlin: `$name`"
                         )
                     }
                 }
@@ -2285,7 +2315,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "get" -> {
                     if (method.parameters().isNotEmpty()) {
                         flagKotlinOperator(
-                            method, "Method can be invoked with an indexing operator from Kotlin: `$name`"
+                                method, "Method can be invoked with an indexing operator from Kotlin: `$name`"
                         )
                     }
                 }
@@ -2293,7 +2323,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "set" -> {
                     if (method.parameters().size > 1) {
                         flagKotlinOperator(
-                            method, "Method can be invoked with an indexing operator from Kotlin: `$name`"
+                                method, "Method can be invoked with an indexing operator from Kotlin: `$name`"
                         )
                     }
                 }
@@ -2301,7 +2331,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "invoke" -> {
                     if (method.parameters().size > 1) {
                         flagKotlinOperator(
-                            method, "Method can be invoked with function call syntax from Kotlin: `$name`"
+                                method, "Method can be invoked with function call syntax from Kotlin: `$name`"
                         )
                     }
                 }
@@ -2309,7 +2339,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 "plusAssign", "minusAssign", "timesAssign", "divAssign", "remAssign", "modAssign" -> {
                     if (method.parameters().size == 1 && method.returnType().toTypeString() == "void") {
                         flagKotlinOperator(
-                            method, "Method can be invoked as a compound assignment operator from Kotlin: `$name`"
+                                method, "Method can be invoked as a compound assignment operator from Kotlin: `$name`"
                         )
                     }
                 }
@@ -2334,6 +2364,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             "char[]" -> {
                 return
             }
+
             else -> {
                 val action = when (item) {
                     is MethodItem -> {
@@ -2346,13 +2377,14 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                         }
                         "Method should return"
                     }
+
                     is FieldItem -> "Field should be"
                     else -> "Method parameter should be"
                 }
                 val component = type.asClass()?.simpleName() ?: ""
                 report(
-                    ARRAY_RETURN, item,
-                    "$action Collection<$component> (or subclass) instead of raw array; was `$typeString`"
+                        ARRAY_RETURN, item,
+                        "$action Collection<$component> (or subclass) instead of raw array; was `$typeString`"
                 )
             }
         }
@@ -2361,8 +2393,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     private fun checkUserHandle(cls: ClassItem, methods: Sequence<MethodItem>) {
         val qualifiedName = cls.qualifiedName()
         if (qualifiedName == "android.content.pm.LauncherApps" ||
-            qualifiedName == "android.os.UserHandle" ||
-            qualifiedName == "android.os.UserManager"
+                qualifiedName == "android.os.UserHandle" ||
+                qualifiedName == "android.os.UserManager"
         ) {
             return
         }
@@ -2382,16 +2414,16 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             }
             if (qualifiedName.endsWith("Manager")) {
                 report(
-                    USER_HANDLE, method,
-                    "When a method overload is needed to target a specific " +
-                        "UserHandle, callers should be directed to use " +
-                        "Context.createPackageContextAsUser() and re-obtain the relevant " +
-                        "Manager, and no new API should be added"
+                        USER_HANDLE, method,
+                        "When a method overload is needed to target a specific " +
+                                "UserHandle, callers should be directed to use " +
+                                "Context.createPackageContextAsUser() and re-obtain the relevant " +
+                                "Manager, and no new API should be added"
                 )
             } else if (!(name.endsWith("AsUser") || name.endsWith("ForUser"))) {
                 report(
-                    USER_HANDLE_NAME, method,
-                    "Method taking UserHandle should be named `doFooAsUser` or `queryFooForUser`, was `$name`"
+                        USER_HANDLE_NAME, method,
+                        "Method taking UserHandle should be named `doFooAsUser` or `queryFooForUser`, was `$name`"
                 )
             }
         }
@@ -2401,19 +2433,19 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         val qualifiedName = cls.qualifiedName()
         for (suffix in badParameterClassNames) {
             if (qualifiedName.endsWith(suffix) && !(
-                (
-                    qualifiedName.endsWith("Params") ||
-                        qualifiedName == "android.app.ActivityOptions" ||
-                        qualifiedName == "android.app.BroadcastOptions" ||
-                        qualifiedName == "android.os.Bundle" ||
-                        qualifiedName == "android.os.BaseBundle" ||
-                        qualifiedName == "android.os.PersistableBundle"
-                    )
-                )
+                            (
+                                    qualifiedName.endsWith("Params") ||
+                                            qualifiedName == "android.app.ActivityOptions" ||
+                                            qualifiedName == "android.app.BroadcastOptions" ||
+                                            qualifiedName == "android.os.Bundle" ||
+                                            qualifiedName == "android.os.BaseBundle" ||
+                                            qualifiedName == "android.os.PersistableBundle"
+                                    )
+                            )
             ) {
                 report(
-                    USER_HANDLE_NAME, cls,
-                    "Classes holding a set of parameters should be called `FooParams`, was `${cls.simpleName()}`"
+                        USER_HANDLE_NAME, cls,
+                        "Classes holding a set of parameters should be called `FooParams`, was `${cls.simpleName()}`"
                 )
             }
         }
@@ -2422,7 +2454,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     private fun checkServices(field: FieldItem) {
         val type = field.type()
         if (!type.isString() || !field.modifiers.isFinal() || !field.modifiers.isStatic() ||
-            field.containingClass().qualifiedName() != "android.content.Context"
+                field.containingClass().qualifiedName() != "android.content.Context"
         ) {
             return
         }
@@ -2432,39 +2464,39 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
 
         if (value == null) {
             val mustEndInService =
-                if (!endsWithService) " and its name must end with `_SERVICE`" else ""
+                    if (!endsWithService) " and its name must end with `_SERVICE`" else ""
 
             report(
-                SERVICE_NAME, field,
-                "Non-constant service constant `$name`. Must be static," +
-                    " final and initialized with a String literal$mustEndInService."
+                    SERVICE_NAME, field,
+                    "Non-constant service constant `$name`. Must be static," +
+                            " final and initialized with a String literal$mustEndInService."
             )
             return
         }
 
         if (name.endsWith("_MANAGER_SERVICE")) {
             report(
-                SERVICE_NAME, field,
-                "Inconsistent service constant name; expected " +
-                    "`${name.removeSuffix("_MANAGER_SERVICE")}_SERVICE`, was `$name`"
+                    SERVICE_NAME, field,
+                    "Inconsistent service constant name; expected " +
+                            "`${name.removeSuffix("_MANAGER_SERVICE")}_SERVICE`, was `$name`"
             )
         } else if (endsWithService) {
             val service = name.substring(0, name.length - "_SERVICE".length).lowercase(Locale.US)
             if (service != value) {
                 report(
-                    SERVICE_NAME, field,
-                    "Inconsistent service value; expected `$service`, was `$value` (Note: Do not" +
-                        " change the name of already released services, which will break tools" +
-                        " using `adb shell dumpsys`." +
-                        " Instead add `@SuppressLint(\"${SERVICE_NAME.name}\"))`"
+                        SERVICE_NAME, field,
+                        "Inconsistent service value; expected `$service`, was `$value` (Note: Do not" +
+                                " change the name of already released services, which will break tools" +
+                                " using `adb shell dumpsys`." +
+                                " Instead add `@SuppressLint(\"${SERVICE_NAME.name}\"))`"
                 )
             }
         } else {
             val valueUpper = value.uppercase(Locale.US)
             report(
-                SERVICE_NAME, field,
-                "Inconsistent service constant name;" +
-                    " expected `${valueUpper}_SERVICE`, was `$name`"
+                    SERVICE_NAME, field,
+                    "Inconsistent service constant name;" +
+                            " expected `${valueUpper}_SERVICE`, was `$name`"
             )
         }
     }
@@ -2476,8 +2508,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 return
             }
             report(
-                METHOD_NAME_TENSE, method,
-                "Unexpected tense; probably meant `enabled`, was `$name`"
+                    METHOD_NAME_TENSE, method,
+                    "Unexpected tense; probably meant `enabled`, was `$name`"
             )
         }
     }
@@ -2513,38 +2545,38 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
             else -> return
         }
         report(
-            USE_ICU, item,
-            "Type `$typeString` should be replaced with richer ICU type `$better`"
+                USE_ICU, item,
+                "Type `$typeString` should be replaced with richer ICU type `$better`"
         )
     }
 
     private fun checkClone(method: MethodItem) {
         if (method.name() == "clone" && method.parameters().isEmpty()) {
             report(
-                NO_CLONE, method,
-                "Provide an explicit copy constructor instead of implementing `clone()`"
+                    NO_CLONE, method,
+                    "Provide an explicit copy constructor instead of implementing `clone()`"
             )
         }
     }
 
     private fun checkPfd(type: String, item: Item) {
         if (item.containingClass()?.qualifiedName() in lowLevelFileClassNames ||
-            isServiceDumpMethod(item)
+                isServiceDumpMethod(item)
         ) {
             return
         }
 
         if (type == "java.io.FileDescriptor") {
             report(
-                USE_PARCEL_FILE_DESCRIPTOR, item,
-                "Must use ParcelFileDescriptor instead of FileDescriptor in ${item.describe()}"
+                    USE_PARCEL_FILE_DESCRIPTOR, item,
+                    "Must use ParcelFileDescriptor instead of FileDescriptor in ${item.describe()}"
             )
         } else if (type == "int" && item is MethodItem) {
             val name = item.name()
             if (name.contains("Fd") || name.contains("FD") || name.contains("FileDescriptor", ignoreCase = true)) {
                 report(
-                    USE_PARCEL_FILE_DESCRIPTOR, item,
-                    "Must use ParcelFileDescriptor instead of FileDescriptor in ${item.describe()}"
+                        USE_PARCEL_FILE_DESCRIPTOR, item,
+                        "Must use ParcelFileDescriptor instead of FileDescriptor in ${item.describe()}"
                 )
             }
         }
@@ -2553,16 +2585,16 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     private fun checkNumbers(type: String, item: Item) {
         if (type == "short" || type == "byte") {
             report(
-                NO_BYTE_OR_SHORT, item,
-                "Should avoid odd sized primitives; use `int` instead of `$type` in ${item.describe()}"
+                    NO_BYTE_OR_SHORT, item,
+                    "Should avoid odd sized primitives; use `int` instead of `$type` in ${item.describe()}"
             )
         }
     }
 
     private fun checkSingleton(
-        cls: ClassItem,
-        methods: Sequence<MethodItem>,
-        constructors: Sequence<ConstructorItem>
+            cls: ClassItem,
+            methods: Sequence<MethodItem>,
+            constructors: Sequence<ConstructorItem>
     ) {
         if (constructors.none()) {
             return
@@ -2570,8 +2602,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         if (methods.any { it.name().startsWith("get") && it.name().endsWith("Instance") && it.modifiers.isStatic() }) {
             for (constructor in constructors) {
                 report(
-                    SINGLETON_CONSTRUCTOR, constructor,
-                    "Singleton classes should use `getInstance()` methods: `${cls.simpleName()}`"
+                        SINGLETON_CONSTRUCTOR, constructor,
+                        "Singleton classes should use `getInstance()` methods: `${cls.simpleName()}`"
                 )
             }
         }
@@ -2582,22 +2614,22 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         val superCls = cls.superClass() ?: return
         if (superCls.extends("android.os.AsyncTask")) {
             report(
-                FORBIDDEN_SUPER_CLASS, cls,
-                "${cls.simpleName()} should not extend `AsyncTask`. AsyncTask is an implementation detail. Expose a listener or, in androidx, a `ListenableFuture` API instead"
+                    FORBIDDEN_SUPER_CLASS, cls,
+                    "${cls.simpleName()} should not extend `AsyncTask`. AsyncTask is an implementation detail. Expose a listener or, in androidx, a `ListenableFuture` API instead"
             )
         }
         if (superCls.extends("android.app.Activity")) {
             report(
-                FORBIDDEN_SUPER_CLASS, cls,
-                "${cls.simpleName()} should not extend `Activity`. Activity subclasses are impossible to compose. Expose a composable API instead."
+                    FORBIDDEN_SUPER_CLASS, cls,
+                    "${cls.simpleName()} should not extend `Activity`. Activity subclasses are impossible to compose. Expose a composable API instead."
             )
         }
         badFutureTypes.firstOrNull { cls.extendsOrImplements(it) }?.let {
             val extendOrImplement = if (cls.extends(it)) "extend" else "implement"
             report(
-                BAD_FUTURE, cls,
-                "${cls.simpleName()} should not $extendOrImplement `$it`." +
-                    " In AndroidX, use (but do not extend) ListenableFuture. In platform, use a combination of OutcomeReceiver<R,E>, Executor, and CancellationSignal`."
+                    BAD_FUTURE, cls,
+                    "${cls.simpleName()} should not $extendOrImplement `$it`." +
+                            " In AndroidX, use (but do not extend) ListenableFuture. In platform, use a combination of OutcomeReceiver<R,E>, Executor, and CancellationSignal`."
             )
         }
     }
@@ -2613,7 +2645,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     private fun checkUri(typeString: String, item: Item) {
         badUriTypes.firstOrNull { typeString.contains(it) }?.let {
             report(
-                ANDROID_URI, item, "Use android.net.Uri instead of $it (${item.describe()})"
+                    ANDROID_URI, item, "Use android.net.Uri instead of $it (${item.describe()})"
             )
         }
     }
@@ -2621,23 +2653,23 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     private fun checkFutures(typeString: String, item: Item) {
         badFutureTypes.firstOrNull { typeString.contains(it) }?.let {
             report(
-                BAD_FUTURE, item,
-                "Use ListenableFuture (library), " +
-                    "or a combination of OutcomeReceiver<R,E>, Executor, and CancellationSignal (platform) instead of $it (${item.describe()})"
+                    BAD_FUTURE, item,
+                    "Use ListenableFuture (library), " +
+                            "or a combination of OutcomeReceiver<R,E>, Executor, and CancellationSignal (platform) instead of $it (${item.describe()})"
             )
         }
     }
 
     private fun checkMethodSuffixListenableFutureReturn(type: TypeItem, method: MethodItem) {
         if (type.toTypeString().contains(listenableFuture) &&
-            !method.isConstructor() &&
-            !method.name().endsWith("Async")
+                !method.isConstructor() &&
+                !method.name().endsWith("Async")
         ) {
             report(
-                ASYNC_SUFFIX_FUTURE,
-                method,
-                "Methods returning $listenableFuture should have a suffix *Async to " +
-                    "reserve unmodified name for a suspend function"
+                    ASYNC_SUFFIX_FUTURE,
+                    method,
+                    "Methods returning $listenableFuture should have a suffix *Async to " +
+                            "reserve unmodified name for a suspend function"
             )
         }
     }
@@ -2655,15 +2687,17 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
     companion object {
 
         private data class GetterSetterPattern(val getter: String, val setter: String)
+
         private val goodBooleanGetterSetterPrefixes = listOf(
-            GetterSetterPattern("has", "setHas"),
-            GetterSetterPattern("can", "setCan"),
-            GetterSetterPattern("should", "setShould"),
-            GetterSetterPattern("is", "set")
+                GetterSetterPattern("has", "setHas"),
+                GetterSetterPattern("can", "setCan"),
+                GetterSetterPattern("should", "setShould"),
+                GetterSetterPattern("is", "set")
         )
+
         private fun List<GetterSetterPattern>.match(
-            name: String,
-            prop: (GetterSetterPattern) -> String
+                name: String,
+                prop: (GetterSetterPattern) -> String
         ) = firstOrNull {
             name.startsWith(prop(it)) && name.getOrNull(prop(it).length)?.let { charAfterPrefix ->
                 charAfterPrefix.isUpperCase() || charAfterPrefix.isDigit()
@@ -2674,14 +2708,14 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         private val badBooleanSetterPrefixes = listOf("setIs", "set")
 
         private val badParameterClassNames = listOf(
-            "Param", "Parameter", "Parameters", "Args", "Arg", "Argument", "Arguments", "Options", "Bundle"
+                "Param", "Parameter", "Parameters", "Args", "Arg", "Argument", "Arguments", "Options", "Bundle"
         )
 
         private val badUriTypes = listOf("java.net.URL", "java.net.URI", "android.net.URL")
 
         private val badFutureTypes = listOf(
-            "java.util.concurrent.CompletableFuture",
-            "java.util.concurrent.Future"
+                "java.util.concurrent.CompletableFuture",
+                "java.util.concurrent.Future"
         )
 
         private val listenableFuture = "com.google.common.util.concurrent.ListenableFuture"
@@ -2691,11 +2725,11 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
          * isn't required
          */
         private val lowLevelFileClassNames = listOf(
-            "android.os.FileUtils",
-            "android.system.Os",
-            "android.net.util.SocketUtils",
-            "android.os.NativeHandle",
-            "android.os.ParcelFileDescriptor"
+                "android.os.FileUtils",
+                "android.system.Os",
+                "android.net.util.SocketUtils",
+                "android.os.NativeHandle",
+                "android.os.ParcelFileDescriptor"
         )
 
         /**
@@ -2703,52 +2737,52 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
          * consistency with existing API surface.
          */
         private val classesWithBareFields = listOf(
-            "android.app.ActivityManager.RecentTaskInfo",
-            "android.app.Notification",
-            "android.content.pm.ActivityInfo",
-            "android.content.pm.ApplicationInfo",
-            "android.content.pm.ComponentInfo",
-            "android.content.pm.ResolveInfo",
-            "android.content.pm.FeatureGroupInfo",
-            "android.content.pm.InstrumentationInfo",
-            "android.content.pm.PackageInfo",
-            "android.content.pm.PackageItemInfo",
-            "android.content.res.Configuration",
-            "android.graphics.BitmapFactory.Options",
-            "android.os.Message",
-            "android.system.StructPollfd"
+                "android.app.ActivityManager.RecentTaskInfo",
+                "android.app.Notification",
+                "android.content.pm.ActivityInfo",
+                "android.content.pm.ApplicationInfo",
+                "android.content.pm.ComponentInfo",
+                "android.content.pm.ResolveInfo",
+                "android.content.pm.FeatureGroupInfo",
+                "android.content.pm.InstrumentationInfo",
+                "android.content.pm.PackageInfo",
+                "android.content.pm.PackageItemInfo",
+                "android.content.res.Configuration",
+                "android.graphics.BitmapFactory.Options",
+                "android.os.Message",
+                "android.system.StructPollfd"
         )
 
         /**
          * Classes containing setting provider keys.
          */
         private val settingsKeyClasses = listOf(
-            "android.provider.Settings.Global",
-            "android.provider.Settings.Secure",
-            "android.provider.Settings.System"
+                "android.provider.Settings.Global",
+                "android.provider.Settings.Secure",
+                "android.provider.Settings.System"
         )
 
         private val badUnits = mapOf(
-            "Ns" to "Nanos",
-            "Ms" to "Millis or Micros",
-            "Sec" to "Seconds",
-            "Secs" to "Seconds",
-            "Hr" to "Hours",
-            "Hrs" to "Hours",
-            "Mo" to "Months",
-            "Mos" to "Months",
-            "Yr" to "Years",
-            "Yrs" to "Years",
-            "Byte" to "Bytes",
-            "Space" to "Bytes"
+                "Ns" to "Nanos",
+                "Ms" to "Millis or Micros",
+                "Sec" to "Seconds",
+                "Secs" to "Seconds",
+                "Hr" to "Hours",
+                "Hrs" to "Hours",
+                "Mo" to "Months",
+                "Mos" to "Months",
+                "Yr" to "Years",
+                "Yrs" to "Years",
+                "Byte" to "Bytes",
+                "Space" to "Bytes"
         )
         private val uiPackageParts = listOf(
-            "animation",
-            "view",
-            "graphics",
-            "transition",
-            "widget",
-            "webkit"
+                "animation",
+                "view",
+                "graphics",
+                "transition",
+                "widget",
+                "webkit"
         )
 
         private val constantNamePattern = Regex("[A-Z0-9_]+")
@@ -2766,7 +2800,7 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         private val acronymPattern3 = Regex("([A-Z]){3,}")
 
         private val serviceDumpMethodParameterTypes =
-            listOf("java.io.FileDescriptor", "java.io.PrintWriter", "java.lang.String[]")
+                listOf("java.io.FileDescriptor", "java.io.PrintWriter", "java.lang.String[]")
 
         private fun isServiceDumpMethod(item: Item) = when (item) {
             is MethodItem -> isServiceDumpMethod(item)
@@ -2775,8 +2809,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
         }
 
         private fun isServiceDumpMethod(item: MethodItem) = item.name() == "dump" &&
-            item.containingClass().extends("android.app.Service") &&
-            item.parameters().map { it.type().toTypeString() } == serviceDumpMethodParameterTypes
+                item.containingClass().extends("android.app.Service") &&
+                item.parameters().map { it.type().toTypeString() } == serviceDumpMethodParameterTypes
 
         private fun hasAcronyms(name: String): Boolean {
             // Require 3 capitals, or 2 if it's at the end of a word.
@@ -2806,13 +2840,13 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                 // The entire thing is capitalized. If so, just perform
                 // normal capitalization, but try dropping _'s.
                 return SdkVersionInfo.underlinesToCamelCase(s.lowercase(Locale.US))
-                    .replaceFirstChar {
-                        if (it.isLowerCase()) {
-                            it.titlecase(Locale.getDefault())
-                        } else {
-                            it.toString()
+                        .replaceFirstChar {
+                            if (it.isLowerCase()) {
+                                it.titlecase(Locale.getDefault())
+                            } else {
+                                it.toString()
+                            }
                         }
-                    }
             }
 
             while (true) {
@@ -2829,8 +2863,8 @@ class ApiLint(private val codebase: Codebase, private val oldCodebase: Codebase?
                     s.replace(acronym, decapitalized)
                 } else {
                     val replacement = acronym[0] + acronym.substring(
-                        1,
-                        acronym.length - 1
+                            1,
+                            acronym.length - 1
                     ).lowercase(Locale.US) + acronym[acronym.length - 1]
                     s.replace(acronym, replacement)
                 }

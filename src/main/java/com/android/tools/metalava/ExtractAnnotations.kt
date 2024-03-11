@@ -67,30 +67,30 @@ import kotlin.text.Charsets.UTF_8
 // and only those with source retention (and in particular right now that just means the
 // typedef annotations.)
 class ExtractAnnotations(
-    private val codebase: Codebase,
-    private val outputFile: File
+        private val codebase: Codebase,
+        private val outputFile: File
 ) : ApiVisitor() {
     // Used linked hash map for order such that we always emit parameters after their surrounding method etc
     private val packageToAnnotationPairs = LinkedHashMap<PackageItem, MutableList<Pair<Item, AnnotationHolder>>>()
 
     private data class AnnotationHolder(
-        val annotationClass: ClassItem?,
-        val annotationItem: AnnotationItem,
-        val uAnnotation: UAnnotation?
+            val annotationClass: ClassItem?,
+            val annotationItem: AnnotationItem,
+            val uAnnotation: UAnnotation?
     )
 
     private val fieldNamePrinter = CodePrinter(
-        codebase = codebase,
-        filterReference = filterReference,
-        inlineFieldValues = false,
-        skipUnknown = true
+            codebase = codebase,
+            filterReference = filterReference,
+            inlineFieldValues = false,
+            skipUnknown = true
     )
 
     private val fieldValuePrinter = CodePrinter(
-        codebase = codebase,
-        filterReference = filterReference,
-        inlineFieldValues = true,
-        skipUnknown = true
+            codebase = codebase,
+            filterReference = filterReference,
+            inlineFieldValues = true,
+            skipUnknown = true
     )
 
     private val classToAnnotationHolder = mutableMapOf<String, AnnotationHolder>()
@@ -102,7 +102,7 @@ class ExtractAnnotations(
         FileOutputStream(outputFile).use { fileOutputStream ->
             JarOutputStream(BufferedOutputStream(fileOutputStream)).use { zos ->
                 val sortedPackages =
-                    packageToAnnotationPairs.keys.asSequence().sortedBy { it.qualifiedName() }.toList()
+                        packageToAnnotationPairs.keys.asSequence().sortedBy { it.qualifiedName() }.toList()
 
                 for (pkg in sortedPackages) {
                     // Note: Using / rather than File.separator: jar lib requires it
@@ -163,7 +163,7 @@ class ExtractAnnotations(
 
         val list = packageToAnnotationPairs[pkg] ?: run {
             val new =
-                mutableListOf<Pair<Item, AnnotationHolder>>()
+                    mutableListOf<Pair<Item, AnnotationHolder>>()
             packageToAnnotationPairs[pkg] = new
             new
         }
@@ -187,8 +187,8 @@ class ExtractAnnotations(
         for (annotation in item.modifiers.annotations()) {
             val qualifiedName = annotation.qualifiedName ?: continue
             if (qualifiedName.startsWith(JAVA_LANG_PREFIX) ||
-                qualifiedName.startsWith(ANDROIDX_ANNOTATION_PREFIX) ||
-                qualifiedName.startsWith(ANDROID_ANNOTATION_PREFIX)
+                    qualifiedName.startsWith(ANDROIDX_ANNOTATION_PREFIX) ||
+                    qualifiedName.startsWith(ANDROID_ANNOTATION_PREFIX)
             ) {
                 if (annotation.isTypeDefAnnotation()) {
                     // Imported typedef
@@ -199,7 +199,7 @@ class ExtractAnnotations(
 
                 continue
             } else if (qualifiedName.startsWith(ORG_JETBRAINS_ANNOTATIONS_PREFIX) ||
-                qualifiedName.startsWith(ORG_INTELLIJ_LANG_ANNOTATIONS_PREFIX)
+                    qualifiedName.startsWith(ORG_INTELLIJ_LANG_ANNOTATIONS_PREFIX)
             ) {
                 // Externally merged metadata, like @Contract and @Language
                 addItem(item, AnnotationHolder(null, annotation, null))
@@ -222,41 +222,41 @@ class ExtractAnnotations(
                     // Make sure it has the right retention
                     if (!hasSourceRetention(typeDefClass)) {
                         reporter.report(
-                            Issues.ANNOTATION_EXTRACTION, typeDefClass,
-                            "This typedef annotation class should have @Retention(RetentionPolicy.SOURCE)"
+                                Issues.ANNOTATION_EXTRACTION, typeDefClass,
+                                "This typedef annotation class should have @Retention(RetentionPolicy.SOURCE)"
                         )
                     }
 
                     if (filterEmit.test(typeDefClass)) {
                         reporter.report(
-                            Issues.ANNOTATION_EXTRACTION, typeDefClass,
-                            "This typedef annotation class should be marked @hide or should not be marked public"
+                                Issues.ANNOTATION_EXTRACTION, typeDefClass,
+                                "This typedef annotation class should be marked @hide or should not be marked public"
                         )
                     }
 
                     val result =
-                        if (typeDefAnnotation is PsiAnnotationItem && typeDefClass is PsiClassItem) {
-                            AnnotationHolder(
-                                typeDefClass, typeDefAnnotation,
-                                UastFacade.convertElement(
-                                    typeDefAnnotation.psiAnnotation,
-                                    null,
-                                    UAnnotation::class.java
-                                ) as UAnnotation
-                            )
-                        } else if (typeDefAnnotation is UAnnotationItem && typeDefClass is PsiClassItem) {
-                            AnnotationHolder(
-                                typeDefClass, typeDefAnnotation, typeDefAnnotation.uAnnotation
-                            )
-                        } else {
-                            continue
-                        }
+                            if (typeDefAnnotation is PsiAnnotationItem && typeDefClass is PsiClassItem) {
+                                AnnotationHolder(
+                                        typeDefClass, typeDefAnnotation,
+                                        UastFacade.convertElement(
+                                                typeDefAnnotation.psiAnnotation,
+                                                null,
+                                                UAnnotation::class.java
+                                        ) as UAnnotation
+                                )
+                            } else if (typeDefAnnotation is UAnnotationItem && typeDefClass is PsiClassItem) {
+                                AnnotationHolder(
+                                        typeDefClass, typeDefAnnotation, typeDefAnnotation.uAnnotation
+                                )
+                            } else {
+                                continue
+                            }
 
                     classToAnnotationHolder[className] = result
                     addItem(item, result)
 
                     if (item is PsiMethodItem && result.uAnnotation != null &&
-                        !reporter.isSuppressed(Issues.RETURNING_UNEXPECTED_CONSTANT)
+                            !reporter.isSuppressed(Issues.RETURNING_UNEXPECTED_CONSTANT)
                     ) {
                         verifyReturnedConstants(item, result.uAnnotation, result, className)
                     }
@@ -271,10 +271,10 @@ class ExtractAnnotations(
      * and flags any returned constants not in the list.
      */
     private fun verifyReturnedConstants(
-        item: PsiMethodItem,
-        uAnnotation: UAnnotation,
-        result: AnnotationHolder,
-        className: String
+            item: PsiMethodItem,
+            uAnnotation: UAnnotation,
+            result: AnnotationHolder,
+            className: String
     ) {
         val method = item.psiMethod
         if (method.body != null) {
@@ -287,7 +287,7 @@ class ExtractAnnotations(
                         val resolved = value.resolve() as? PsiField ?: return
                         val modifiers = resolved.modifierList ?: return
                         if (modifiers.hasModifierProperty(PsiModifier.STATIC) &&
-                            modifiers.hasModifierProperty(PsiModifier.FINAL)
+                                modifiers.hasModifierProperty(PsiModifier.FINAL)
                         ) {
                             if (resolved.type.arrayDimensions > 0) {
                                 return
@@ -302,9 +302,11 @@ class ExtractAnnotations(
                             if (names.isNotEmpty() && !names.contains(name)) {
                                 val expected = names.joinToString { it }
                                 reporter.report(
-                                    Issues.RETURNING_UNEXPECTED_CONSTANT, value as PsiElement,
-                                    "Returning unexpected constant $name; is @${result.annotationClass?.simpleName()
-                                        ?: className} missing this constant? Expected one of $expected"
+                                        Issues.RETURNING_UNEXPECTED_CONSTANT, value as PsiElement,
+                                        "Returning unexpected constant $name; is @${
+                                            result.annotationClass?.simpleName()
+                                                    ?: className
+                                        } missing this constant? Expected one of $expected"
                                 )
                             }
                         }
@@ -336,12 +338,12 @@ class ExtractAnnotations(
             for (psiAnnotation in modifierList.annotations) {
                 val uAnnotation = psiAnnotation.toUElement(UAnnotation::class.java)
                 val hasSourceRetention =
-                    if (uAnnotation != null) {
-                        hasSourceRetention(uAnnotation)
-                    } else {
-                        // There is a hole in UAST conversion. If so, fall back to using PSI.
-                        hasSourceRetention(psiAnnotation)
-                    }
+                        if (uAnnotation != null) {
+                            hasSourceRetention(uAnnotation)
+                        } else {
+                            // There is a hole in UAST conversion. If so, fall back to using PSI.
+                            hasSourceRetention(psiAnnotation)
+                        }
                 if (hasSourceRetention) {
                     return true
                 }
@@ -357,8 +359,8 @@ class ExtractAnnotations(
             val attributes = annotation.attributeValues
             if (attributes.size != 1) {
                 reporter.report(
-                    Issues.ANNOTATION_EXTRACTION, annotation.sourcePsi,
-                    "Expected exactly one parameter passed to @Retention"
+                        Issues.ANNOTATION_EXTRACTION, annotation.sourcePsi,
+                        "Expected exactly one parameter passed to @Retention"
                 )
                 return false
             }
@@ -388,8 +390,8 @@ class ExtractAnnotations(
             val attributes = psiAnnotation.parameterList.attributes
             if (attributes.size != 1) {
                 reporter.report(
-                    Issues.ANNOTATION_EXTRACTION, psiAnnotation,
-                    "Expected exactly one parameter passed to @Retention"
+                        Issues.ANNOTATION_EXTRACTION, psiAnnotation,
+                        "Expected exactly one parameter passed to @Retention"
                 )
                 return false
             }
@@ -397,6 +399,7 @@ class ExtractAnnotations(
                 is JvmAnnotationEnumFieldValue -> SOURCE == value.fieldName
                 is JvmAnnotationConstantValue ->
                     (value.constantValue as? String)?.contains(SOURCE) ?: false
+
                 else -> false
             }
         }
@@ -409,7 +412,7 @@ class ExtractAnnotations(
      * freeze point and then reset back to it
      */
     private class StringPrintWriter constructor(private val stringWriter: StringWriter) :
-        PrintWriter(stringWriter) {
+            PrintWriter(stringWriter) {
         private var mark: Int = 0
 
         val contents: String get() = stringWriter.toString()
@@ -476,9 +479,9 @@ class ExtractAnnotations(
                         sb.append(',').append(' ')
                     }
                     val type = parameterList[i].type().toTypeString()
-                        .replace(" ", "")
-                        .replace("?extends", "? extends ")
-                        .replace("?super", "? super ")
+                            .replace(" ", "")
+                            .replace("?extends", "? extends ")
+                            .replace("?super", "? super ")
                     sb.append(escapeXml(type))
                     i++
                 }
@@ -499,19 +502,20 @@ class ExtractAnnotations(
     }
 
     private fun writeAnnotation(
-        writer: StringPrintWriter,
-        item: Item,
-        annotationHolder: AnnotationHolder
+            writer: StringPrintWriter,
+            item: Item,
+            annotationHolder: AnnotationHolder
     ) {
         val annotationItem = annotationHolder.annotationItem
         val uAnnotation = annotationHolder.uAnnotation
-            ?: when (annotationItem) {
-                is UAnnotationItem -> annotationItem.uAnnotation
-                is PsiAnnotationItem ->
-                    // Imported annotation
-                    annotationItem.psiAnnotation.toUElement(UAnnotation::class.java) ?: return
-                else -> return
-            }
+                ?: when (annotationItem) {
+                    is UAnnotationItem -> annotationItem.uAnnotation
+                    is PsiAnnotationItem ->
+                        // Imported annotation
+                        annotationItem.psiAnnotation.toUElement(UAnnotation::class.java) ?: return
+
+                    else -> return
+                }
         val qualifiedName = annotationItem.qualifiedName
 
         writer.mark()
@@ -532,10 +536,10 @@ class ExtractAnnotations(
         if (sortAnnotations) {
             // Ensure that the value attribute is written first
             attributes = attributes.sortedWith(
-                compareBy(
-                    { (it.name ?: SdkConstants.ATTR_VALUE) != SdkConstants.ATTR_VALUE },
-                    { it.name }
-                )
+                    compareBy(
+                            { (it.name ?: SdkConstants.ATTR_VALUE) != SdkConstants.ATTR_VALUE },
+                            { it.name }
+                    )
             )
         }
 
@@ -584,8 +588,8 @@ class ExtractAnnotations(
             // extracted metadata.
             if (("prefix" == name || "suffix" == name) && annotationItem.isTypeDefAnnotation()) {
                 reporter.report(
-                    Issues.SUPERFLUOUS_PREFIX, item,
-                    "Superfluous $name attribute on typedef"
+                        Issues.SUPERFLUOUS_PREFIX, item,
+                        "Superfluous $name attribute on typedef"
                 )
                 continue
             }
@@ -607,15 +611,15 @@ class ExtractAnnotations(
     }
 
     private fun attributeString(
-        value: UExpression?,
-        inlineConstants: Boolean
+            value: UExpression?,
+            inlineConstants: Boolean
     ): String? {
         val printer =
-            if (inlineConstants) {
-                fieldValuePrinter
-            } else {
-                fieldNamePrinter
-            }
+                if (inlineConstants) {
+                    fieldValuePrinter
+                } else {
+                    fieldNamePrinter
+                }
 
         return printer.toSourceString(value)
     }

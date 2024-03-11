@@ -89,8 +89,8 @@ internal object FileReadSandbox {
         // We also allow $ANDROID_JAVA_HOME, which is used in the Android platform build.
         // (which is normally $ANDROID_BUILD_TOP + "/prebuilts/jdk/jdk11/linux-x86" as of writing.)
         listOf(
-            "JAVA_HOME",
-            "ANDROID_JAVA_HOME"
+                "JAVA_HOME",
+                "ANDROID_JAVA_HOME"
         ).forEach {
             System.getenv(it)?.let { path ->
                 allowAccess(File(path))
@@ -263,6 +263,7 @@ internal object FileReadSandbox {
         override fun checkRead(file: String, context: Any?) {
             check(file)
         }
+
         override fun checkRead(p0: FileDescriptor?) {
         }
 

@@ -43,8 +43,8 @@ fun getNativeDiff(before: File, after: File): String? {
             builder.addArgs("-u", before.path, after.path)
             val processOutputHandler = CachedProcessOutputHandler()
             DefaultProcessExecutor(StdLogger(StdLogger.Level.ERROR))
-                .execute(builder.createProcess(), processOutputHandler)
-                .rethrowFailure()
+                    .execute(builder.createProcess(), processOutputHandler)
+                    .rethrowFailure()
 
             val output = processOutputHandler.processOutput
             val lineCollector = LineCollector()
@@ -60,16 +60,16 @@ fun getNativeDiff(before: File, after: File): String? {
 
 fun getDiff(before: String, after: String, windowSize: Int): String {
     return getDiff(
-        before.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(),
-        after.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(),
-        windowSize
+            before.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(),
+            after.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray(),
+            windowSize
     )
 }
 
 fun getDiff(
-    before: Array<String>,
-    after: Array<String>,
-    windowSize: Int
+        before: Array<String>,
+        after: Array<String>,
+        windowSize: Int
 ): String {
     // Based on the LCS section in http://introcs.cs.princeton.edu/java/96optimization/
     val sb = StringBuilder()

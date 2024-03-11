@@ -27,9 +27,9 @@ import com.android.tools.metalava.model.visitors.ApiVisitor
  * between the two, then see {@link com.android.tools.metalava.NullnessMigration} instead.
  */
 class MarkPackagesAsRecent(val filter: PackageFilter) : ApiVisitor(
-    filterEmit = ApiPredicate(ignoreShown = true),
-    filterReference = ApiPredicate(ignoreShown = true),
-    includeEmptyOuterClasses = true
+        filterEmit = ApiPredicate(ignoreShown = true),
+        filterReference = ApiPredicate(ignoreShown = true),
+        includeEmptyOuterClasses = true
 ) {
     override fun include(cls: ClassItem): Boolean {
         return filter.matches(cls.containingPackage())

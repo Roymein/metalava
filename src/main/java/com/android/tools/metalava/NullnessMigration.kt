@@ -88,7 +88,7 @@ class NullnessMigration : ComparisonVisitor(visitAddedItemsRecursively = true) {
         if (hasNullnessInformation(new)) {
             assert(SUPPORT_TYPE_USE_ANNOTATIONS)
             if (old.toTypeString(outerAnnotations = false, innerAnnotations = true) !=
-                new.toTypeString(outerAnnotations = false, innerAnnotations = true)
+                    new.toTypeString(outerAnnotations = false, innerAnnotations = true)
             ) {
                 new.markRecent()
             }

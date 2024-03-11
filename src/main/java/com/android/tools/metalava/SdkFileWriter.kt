@@ -30,11 +30,11 @@ private const val ANDROID_VIEW_VIEW = "android.view.View"
 private const val ANDROID_VIEW_VIEW_GROUP = "android.view.ViewGroup"
 private const val ANDROID_VIEW_VIEW_GROUP_LAYOUT_PARAMS = "android.view.ViewGroup.LayoutParams"
 private const val SDK_CONSTANT_TYPE_ACTIVITY_ACTION =
-    "android.annotation.SdkConstant.SdkConstantType.ACTIVITY_INTENT_ACTION"
+        "android.annotation.SdkConstant.SdkConstantType.ACTIVITY_INTENT_ACTION"
 private const val SDK_CONSTANT_TYPE_BROADCAST_ACTION =
-    "android.annotation.SdkConstant.SdkConstantType.BROADCAST_INTENT_ACTION"
+        "android.annotation.SdkConstant.SdkConstantType.BROADCAST_INTENT_ACTION"
 private const val SDK_CONSTANT_TYPE_SERVICE_ACTION =
-    "android.annotation.SdkConstant.SdkConstantType.SERVICE_ACTION"
+        "android.annotation.SdkConstant.SdkConstantType.SERVICE_ACTION"
 private const val SDK_CONSTANT_TYPE_CATEGORY = "android.annotation.SdkConstant.SdkConstantType.INTENT_CATEGORY"
 private const val SDK_CONSTANT_TYPE_FEATURE = "android.annotation.SdkConstant.SdkConstantType.FEATURE"
 private const val SDK_WIDGET_ANNOTATION = "android.annotation.Widget"
@@ -78,8 +78,8 @@ class SdkFileWriter(val codebase: Codebase, private val outputDir: File) {
                 for (annotation in annotations) {
                     if (ANDROID_SDK_CONSTANT == annotation.qualifiedName) {
                         val resolved =
-                            annotation.findAttribute(null)?.leafValues()?.firstOrNull()?.resolve() as? FieldItem
-                                ?: continue
+                                annotation.findAttribute(null)?.leafValues()?.firstOrNull()?.resolve() as? FieldItem
+                                        ?: continue
                         when (resolved.containingClass().qualifiedName() + "." + resolved.name()) {
                             SDK_CONSTANT_TYPE_ACTIVITY_ACTION -> activityActions.add(value.toString())
                             SDK_CONSTANT_TYPE_BROADCAST_ACTION -> broadcastActions.add(value.toString())
@@ -222,10 +222,10 @@ class SdkFileWriter(val codebase: Codebase, private val outputDir: File) {
      * @param layoutParams the list of layout param classes to write.
      */
     private fun writeClasses(
-        name: String,
-        widgets: List<ClassItem>,
-        layouts: List<ClassItem>,
-        layoutParams: List<ClassItem>
+            name: String,
+            widgets: List<ClassItem>,
+            layouts: List<ClassItem>,
+            layoutParams: List<ClassItem>
     ) {
         var fw: FileWriter? = null
         var bw: BufferedWriter? = null

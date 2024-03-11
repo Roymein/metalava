@@ -28,43 +28,43 @@ import java.util.function.Predicate
  * signals on the member, all containing classes, and all containing packages.
  */
 class ApiPredicate(
-    /**
-     * Set if the value of [MemberItem.hasShowAnnotation] should be
-     * ignored. That is, this predicate will assume that all encountered members
-     * match the "shown" requirement.
-     *
-     * This is typically useful when generating "current.txt", when no
-     * [Options.showAnnotations] have been defined.
-     */
-    val ignoreShown: Boolean = options.showUnannotated,
+        /**
+         * Set if the value of [MemberItem.hasShowAnnotation] should be
+         * ignored. That is, this predicate will assume that all encountered members
+         * match the "shown" requirement.
+         *
+         * This is typically useful when generating "current.txt", when no
+         * [Options.showAnnotations] have been defined.
+         */
+        val ignoreShown: Boolean = options.showUnannotated,
 
-    /**
-     * Set if the value of [MemberItem.removed] should be ignored.
-     * That is, this predicate will assume that all encountered members match
-     * the "removed" requirement.
-     *
-     * This is typically useful when generating "removed.txt", when it's okay to
-     * reference both current and removed APIs.
-     */
-    private val ignoreRemoved: Boolean = false,
+        /**
+         * Set if the value of [MemberItem.removed] should be ignored.
+         * That is, this predicate will assume that all encountered members match
+         * the "removed" requirement.
+         *
+         * This is typically useful when generating "removed.txt", when it's okay to
+         * reference both current and removed APIs.
+         */
+        private val ignoreRemoved: Boolean = false,
 
-    /**
-     * Set what the value of [MemberItem.removed] must be equal to in
-     * order for a member to match.
-     *
-     * This is typically useful when generating "removed.txt", when you only
-     * want to match members that have actually been removed.
-     */
-    private val matchRemoved: Boolean = false,
+        /**
+         * Set what the value of [MemberItem.removed] must be equal to in
+         * order for a member to match.
+         *
+         * This is typically useful when generating "removed.txt", when you only
+         * want to match members that have actually been removed.
+         */
+        private val matchRemoved: Boolean = false,
 
-    /** Whether we allow matching items loaded from jar files instead of sources */
-    private val allowClassesFromClasspath: Boolean = options.allowClassesFromClasspath,
+        /** Whether we allow matching items loaded from jar files instead of sources */
+        private val allowClassesFromClasspath: Boolean = options.allowClassesFromClasspath,
 
-    /** Whether we should include doc-only items */
-    private val includeDocOnly: Boolean = false,
+        /** Whether we should include doc-only items */
+        private val includeDocOnly: Boolean = false,
 
-    /** Whether to include "for stub purposes" APIs. See [Options.showForStubPurposesAnnotations] */
-    private val includeApisForStubPurposes: Boolean = true
+        /** Whether to include "for stub purposes" APIs. See [Options.showForStubPurposesAnnotations] */
+        private val includeApisForStubPurposes: Boolean = true
 ) : Predicate<Item> {
 
     override fun test(member: Item): Boolean {
@@ -107,9 +107,9 @@ class ApiPredicate(
         }
         while (clazz != null) {
             visible = visible and (
-                clazz.isPublic || clazz.isProtected ||
-                    (clazz.isInternal && clazz.hasShowAnnotation())
-                )
+                    clazz.isPublic || clazz.isProtected ||
+                            (clazz.isInternal && clazz.hasShowAnnotation())
+                    )
             hasShowAnnotation = hasShowAnnotation or (ignoreShown || clazz.hasShowAnnotation())
             hidden = hidden or clazz.hidden
             docOnly = docOnly or clazz.docOnly

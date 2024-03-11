@@ -10,21 +10,27 @@ import com.android.tools.metalava.model.DefaultAnnotationAttribute
 interface AnnotationFilter {
     // tells whether an annotation is included by the filter
     fun matches(annotation: AnnotationItem): Boolean
+
     // tells whether an annotation is included by this filter
     fun matches(annotationSource: String): Boolean
 
     // Returns a list of fully qualified annotation names that may be included by this filter.
     // Note that this filter might incorporate parameters but this function strips them.
     fun getIncludedAnnotationNames(): List<String>
+
     // Returns true if [getIncludedAnnotationNames] includes the given qualified name
     fun matchesAnnotationName(qualifiedName: String): Boolean
+
     // Tells whether there exists an annotation that is accepted by this filter and that
     // ends with the given suffix
     fun matchesSuffix(annotationSuffix: String): Boolean
+
     // Returns true if nothing is matched by this filter
     fun isEmpty(): Boolean
+
     // Returns true if some annotation is matched by this filter
     fun isNotEmpty(): Boolean
+
     // Returns the fully-qualified class name of the first annotation matched by this filter
     fun firstQualifiedName(): String
 }
@@ -75,7 +81,7 @@ class MutableAnnotationFilter : AnnotationFilter {
 
     override fun matchesAnnotationName(qualifiedName: String): Boolean {
         val includedNames = includedNames
-            ?: getIncludedAnnotationNames().also { includedNames = it }
+                ?: getIncludedAnnotationNames().also { includedNames = it }
         return includedNames.contains(qualifiedName)
     }
 
@@ -114,13 +120,15 @@ class MutableAnnotationFilter : AnnotationFilter {
                 // either @Foo(BAR) or @Foo({BAR}) and they are equivalent.
                 when {
                     attribute.value is AnnotationSingleAttributeValue &&
-                        existingValue is AnnotationArrayAttributeValue -> {
+                            existingValue is AnnotationArrayAttributeValue -> {
                         if (existingValueSource != "{$attributeValueSource}") return false
                     }
+
                     attribute.value is AnnotationArrayAttributeValue &&
-                        existingValue is AnnotationSingleAttributeValue -> {
+                            existingValue is AnnotationSingleAttributeValue -> {
                         if ("{$existingValueSource}" != attributeValueSource) return false
                     }
+
                     else -> {
                         if (existingValueSource != attributeValueSource) return false
                     }
@@ -139,8 +147,8 @@ class MutableAnnotationFilter : AnnotationFilter {
 // possibly certain attributes.
 // An AnnotationFilterEntry doesn't necessarily have a Codebase like an AnnotationItem does
 private class AnnotationFilterEntry(
-    val qualifiedName: String,
-    val attributes: List<AnnotationAttribute>
+        val qualifiedName: String,
+        val attributes: List<AnnotationAttribute>
 ) {
     fun findAttribute(name: String?): AnnotationAttribute? {
         val actualName = name ?: ATTR_VALUE
@@ -162,7 +170,7 @@ private class AnnotationFilterEntry(
                 emptyList()
             } else {
                 DefaultAnnotationAttribute.createList(
-                    text.substring(index + 1, text.lastIndexOf(')'))
+                        text.substring(index + 1, text.lastIndexOf(')'))
                 )
             }
             return AnnotationFilterEntry(qualifiedName, attributes)

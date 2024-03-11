@@ -21,9 +21,9 @@ import com.android.SdkConstants.DOT_XML
 
 /** File formats that metalava can emit APIs to */
 enum class FileFormat(
-    val description: String,
-    val version: String? = null,
-    val conciseDefaultValues: Boolean = false
+        val description: String,
+        val version: String? = null,
+        val conciseDefaultValues: Boolean = false
 ) {
     UNKNOWN("?"),
     JDIFF("JDiff"),

@@ -24,6 +24,7 @@ object Issues {
     private val nameToIssue: MutableMap<String, Issue> = HashMap(300)
 
     val PARSE_ERROR = Issue(Severity.ERROR)
+
     // Compatibility issues
     val ADDED_PACKAGE = Issue(Severity.HIDDEN, Category.COMPATIBILITY)
     val ADDED_CLASS = Issue(Severity.HIDDEN, Category.COMPATIBILITY)
@@ -98,6 +99,7 @@ object Issues {
     val DEPRECATED_OPTION = Issue(Severity.WARNING)
     val BOTH_PACKAGE_INFO_AND_HTML = Issue(Severity.WARNING, Category.DOCUMENTATION)
     val UNMATCHED_MERGE_ANNOTATION = Issue(Severity.WARNING)
+
     // The plan is for this to be set as an error once (1) existing code is marked as @deprecated
     // and (2) the principle is adopted by the API council
     val REFERENCES_DEPRECATED = Issue(Severity.HIDDEN)
@@ -107,6 +109,7 @@ object Issues {
     val REFERENCES_HIDDEN = Issue(Severity.ERROR)
     val IGNORING_SYMLINK = Issue(Severity.INFO)
     val INVALID_NULLABILITY_ANNOTATION_WARNING = Issue(Severity.WARNING)
+
     // The plan is for this to be set as an error once (1) existing code is marked as @deprecated
     // and (2) the principle is adopted by the API council
     val EXTENDS_DEPRECATED = Issue(Severity.HIDDEN)
@@ -127,14 +130,15 @@ object Issues {
     val COMPILE_TIME_CONSTANT = Issue(Severity.ERROR, Category.API_LINT)
     val SINGULAR_CALLBACK = Issue(Severity.ERROR, Category.API_LINT, "callback-class-singular")
     val CALLBACK_NAME = Issue(Severity.WARNING, Category.API_LINT, "observer-should-be-callback")
+
     // Obsolete per https://s.android.com/api-guidelines.
     val CALLBACK_INTERFACE =
-        Issue(Severity.HIDDEN, Category.API_LINT, "callback-abstract-instead-of-interface")
+            Issue(Severity.HIDDEN, Category.API_LINT, "callback-abstract-instead-of-interface")
     val CALLBACK_METHOD_NAME = Issue(Severity.ERROR, Category.API_LINT, "callback-method-naming")
     val LISTENER_INTERFACE = Issue(Severity.ERROR, Category.API_LINT, "callbacks-listener")
     val SINGLE_METHOD_INTERFACE = Issue(Severity.ERROR, Category.API_LINT, "callbacks-listener")
     val INTENT_NAME =
-        Issue(Severity.ERROR, Category.API_LINT, "use-standard-prefixes-for-constants")
+            Issue(Severity.ERROR, Category.API_LINT, "use-standard-prefixes-for-constants")
     val ACTION_VALUE = Issue(Severity.ERROR, Category.API_LINT)
     val EQUALS_AND_HASH_CODE = Issue(Severity.ERROR, Category.API_LINT, "equals-and-hashcode")
     val PARCEL_CREATOR = Issue(Severity.ERROR, Category.API_LINT, "parcelable-creator")
@@ -145,13 +149,13 @@ object Issues {
     val REGISTRATION_NAME = Issue(Severity.ERROR, Category.API_LINT, "callbacks-accessors")
     val VISIBLY_SYNCHRONIZED = Issue(Severity.ERROR, Category.API_LINT, "avoid-synchronized")
     val INTENT_BUILDER_NAME =
-        Issue(Severity.WARNING, Category.API_LINT, "intent-builder-createintent")
+            Issue(Severity.WARNING, Category.API_LINT, "intent-builder-createintent")
     val CONTEXT_NAME_SUFFIX = Issue(Severity.ERROR, Category.API_LINT, "classes-subclass-naming")
     val INTERFACE_CONSTANT = Issue(Severity.ERROR, Category.API_LINT, "services-intents")
     val ON_NAME_EXPECTED = Issue(Severity.WARNING, Category.API_LINT, "callback-method-naming")
     val TOP_LEVEL_BUILDER = Issue(Severity.WARNING, Category.API_LINT, "builders-static-inner")
     val MISSING_BUILD_METHOD =
-        Issue(Severity.WARNING, Category.API_LINT, "builder-must-declare-build")
+            Issue(Severity.WARNING, Category.API_LINT, "builder-must-declare-build")
     val BUILDER_SET_STYLE = Issue(Severity.WARNING, Category.API_LINT, "builder-method-naming")
     val SETTER_RETURNS_THIS = Issue(Severity.WARNING, Category.API_LINT)
     val RAW_AIDL = Issue(Severity.ERROR, Category.API_LINT, "no-public-binder")
@@ -162,7 +166,7 @@ object Issues {
     val OVERLAPPING_CONSTANTS = Issue(Severity.WARNING, Category.API_LINT, "overlapping-constants")
     val GENERIC_EXCEPTION = Issue(Severity.ERROR, Category.API_LINT, "appropriate-exception")
     val ILLEGAL_STATE_EXCEPTION =
-        Issue(Severity.WARNING, Category.API_LINT, "appropriate-exception")
+            Issue(Severity.WARNING, Category.API_LINT, "appropriate-exception")
     val RETHROW_REMOTE_EXCEPTION = Issue(Severity.ERROR, Category.API_LINT, "appropriate-exception")
     val MENTIONS_GOOGLE = Issue(Severity.ERROR, Category.API_LINT, "mentions-google")
     val HEAVY_BIT_SET = Issue(Severity.ERROR, Category.API_LINT, "avoid-bitset")
@@ -189,7 +193,7 @@ object Issues {
     val NOT_CLOSEABLE = Issue(Severity.WARNING, Category.API_LINT)
     val KOTLIN_OPERATOR = Issue(Severity.INFO, Category.API_LINT)
     val ARRAY_RETURN =
-        Issue(Severity.WARNING, Category.API_LINT, "methods-prefer-collection-over-array")
+            Issue(Severity.WARNING, Category.API_LINT, "methods-prefer-collection-over-array")
     val USER_HANDLE = Issue(Severity.WARNING, Category.API_LINT)
     val USER_HANDLE_NAME = Issue(Severity.WARNING, Category.API_LINT)
     val SERVICE_NAME = Issue(Severity.ERROR, Category.API_LINT)
@@ -197,7 +201,7 @@ object Issues {
     val NO_CLONE = Issue(Severity.ERROR, Category.API_LINT, "avoid-clone")
     val USE_ICU = Issue(Severity.WARNING, Category.API_LINT)
     val USE_PARCEL_FILE_DESCRIPTOR =
-        Issue(Severity.ERROR, Category.API_LINT, "prefer-parcelfiledescriptor")
+            Issue(Severity.ERROR, Category.API_LINT, "prefer-parcelfiledescriptor")
     val NO_BYTE_OR_SHORT = Issue(Severity.WARNING, Category.API_LINT, "avoid-short-byte")
     val SINGLETON_CONSTRUCTOR = Issue(Severity.ERROR, Category.API_LINT, "singleton-class")
     val COMMON_ARGS_FIRST = Issue(Severity.WARNING, Category.API_LINT, "optional-params-last")
@@ -205,7 +209,7 @@ object Issues {
     val KOTLIN_KEYWORD = Issue(Severity.ERROR, Category.API_LINT)
     val UNIQUE_KOTLIN_OPERATOR = Issue(Severity.ERROR, Category.API_LINT)
     val SAM_SHOULD_BE_LAST =
-        Issue(Severity.WARNING, Category.API_LINT, "placement-of-sam-parameters")
+            Issue(Severity.WARNING, Category.API_LINT, "placement-of-sam-parameters")
     val MISSING_JVMSTATIC = Issue(Severity.WARNING, Category.API_LINT)
     val DEFAULT_VALUE_CHANGE = Issue(Severity.ERROR, Category.API_LINT, "default-value-removal")
     val DOCUMENT_EXCEPTIONS = Issue(Severity.ERROR, Category.API_LINT, "docs-throws")
@@ -220,9 +224,9 @@ object Issues {
     val STATIC_FINAL_BUILDER = Issue(Severity.WARNING, Category.API_LINT, "builders-static-inner")
     val GETTER_ON_BUILDER = Issue(Severity.WARNING, Category.API_LINT, "getter-on-builder")
     val MISSING_GETTER_MATCHING_BUILDER =
-        Issue(Severity.WARNING, Category.API_LINT, "builders-symmetric-setters")
+            Issue(Severity.WARNING, Category.API_LINT, "builders-symmetric-setters")
     val OPTIONAL_BUILDER_CONSTRUCTOR_ARGUMENT =
-        Issue(Severity.WARNING, Category.API_LINT, "builders-nonnull-constructors")
+            Issue(Severity.WARNING, Category.API_LINT, "builders-nonnull-constructors")
     val NO_SETTINGS_PROVIDER = Issue(Severity.HIDDEN, Category.API_LINT, "no-settings-provider")
     val NULLABLE_COLLECTION = Issue(Severity.WARNING, Category.API_LINT, "methods-prefer-non-null-collections")
     val ASYNC_SUFFIX_FUTURE = Issue(Severity.ERROR, Category.API_LINT)
@@ -242,16 +246,16 @@ object Issues {
     }
 
     class Issue private constructor(
-        val defaultLevel: Severity,
-        /**
-         * When `level` is set to [Severity.INHERIT], this is the parent from
-         * which the issue will inherit its level.
-         */
-        val parent: Issue?,
-        /** Applicable category  */
-        val category: Category,
-        /** Related rule, if any  */
-        val rule: String?
+            val defaultLevel: Severity,
+            /**
+             * When `level` is set to [Severity.INHERIT], this is the parent from
+             * which the issue will inherit its level.
+             */
+            val parent: Issue?,
+            /** Applicable category  */
+            val category: Category,
+            /** Related rule, if any  */
+            val rule: String?
     ) {
         /**
          * The name of this issue
@@ -260,19 +264,19 @@ object Issues {
             internal set
 
         internal constructor(
-            defaultLevel: Severity,
-            category: Category = Category.UNKNOWN
+                defaultLevel: Severity,
+                category: Category = Category.UNKNOWN
         ) : this(defaultLevel, null, category, null)
 
         internal constructor(
-            defaultLevel: Severity,
-            category: Category,
-            rule: String
+                defaultLevel: Severity,
+                category: Category,
+                rule: String
         ) : this(defaultLevel, null, category, rule)
 
         internal constructor(
-            parent: Issue,
-            category: Category
+                parent: Issue,
+                category: Category
         ) : this(Severity.INHERIT, parent, category, null)
 
         override fun toString(): String {

@@ -17,12 +17,7 @@
 package com.android.tools.metalava
 
 import com.android.SdkConstants
-import com.android.tools.metalava.model.Codebase
-import com.android.tools.metalava.model.FieldItem
-import com.android.tools.metalava.model.Item
-import com.android.tools.metalava.model.MethodItem
-import com.android.tools.metalava.model.PackageItem
-import com.android.tools.metalava.model.SUPPORT_TYPE_USE_ANNOTATIONS
+import com.android.tools.metalava.model.*
 import com.android.tools.metalava.model.visitors.ApiVisitor
 import com.google.common.io.ByteStreams
 import org.objectweb.asm.ClassReader
@@ -44,11 +39,11 @@ class ConvertJarsToSignatureFiles {
         var api = 1
         while (true) {
             val apiJar = File(
-                root,
-                if (api <= 3)
-                    "prebuilts/tools/common/api-versions/android-$api/android.jar"
-                else
-                    "prebuilts/sdk/$api/public/android.jar"
+                    root,
+                    if (api <= 3)
+                        "prebuilts/tools/common/api-versions/android-$api/android.jar"
+                    else
+                        "prebuilts/sdk/$api/public/android.jar"
             )
             if (!apiJar.isFile) {
                 break
@@ -56,9 +51,9 @@ class ConvertJarsToSignatureFiles {
             val signatureFile = "prebuilts/sdk/$api/public/api/android.txt"
             val oldApiFile = File(root, "prebuilts/sdk/$api/public/api/android.txt")
             val newApiFile =
-                // Place new-style signature files in separate files?
-                // File(root, "prebuilts/sdk/$api/public/api/android.${if (options.compatOutput) "txt" else "v2.txt"}")
-                File(root, "prebuilts/sdk/$api/public/api/android.txt")
+            // Place new-style signature files in separate files?
+                    // File(root, "prebuilts/sdk/$api/public/api/android.${if (options.compatOutput) "txt" else "v2.txt"}")
+                    File(root, "prebuilts/sdk/$api/public/api/android.txt")
 
             progress("Writing signature files $signatureFile for $apiJar")
 
@@ -170,16 +165,19 @@ class ConvertJarsToSignatureFiles {
             } catch (e: IOException) {
                 options.stdout.println("Could not read jar file contents from $file: $e")
             }
+
             file.isDirectory -> {
                 val listFiles = file.listFiles()
                 listFiles?.forEach {
                     markDeprecated(codebase, it, it.path)
                 }
             }
+
             file.path.endsWith(SdkConstants.DOT_CLASS) -> {
                 val bytes = file.readBytes()
                 markDeprecated(codebase, bytes, file.path)
             }
+
             else -> options.stdout.println("Ignoring entry $file")
         }
     }

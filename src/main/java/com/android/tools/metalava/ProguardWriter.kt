@@ -29,15 +29,15 @@ import java.io.PrintWriter
 import java.util.function.Predicate
 
 class ProguardWriter(
-    private val writer: PrintWriter,
-    filterEmit: Predicate<Item>,
-    filterReference: Predicate<Item>
+        private val writer: PrintWriter,
+        filterEmit: Predicate<Item>,
+        filterReference: Predicate<Item>
 ) : ApiVisitor(
-    visitConstructorsAsMethods = false,
-    nestInnerClasses = false,
-    inlineInheritedFields = true,
-    filterEmit = filterEmit,
-    filterReference = filterReference
+        visitConstructorsAsMethods = false,
+        nestInnerClasses = false,
+        inlineInheritedFields = true,
+        filterEmit = filterEmit,
+        filterReference = filterReference
 ) {
 
     override fun visitClass(cls: ClassItem) {

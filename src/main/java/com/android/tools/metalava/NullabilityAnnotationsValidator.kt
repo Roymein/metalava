@@ -47,9 +47,9 @@ class NullabilityAnnotationsValidator {
     }
 
     private data class Error(
-        override val method: MethodItem,
-        val label: String,
-        val type: ErrorType
+            override val method: MethodItem,
+            val label: String,
+            val type: ErrorType
     ) : Issue {
         override fun toString(): String {
             return "ERROR: $method, $label, $type"
@@ -61,9 +61,9 @@ class NullabilityAnnotationsValidator {
     }
 
     private data class Warning(
-        override val method: MethodItem,
-        val label: String,
-        val type: WarningType
+            override val method: MethodItem,
+            val label: String,
+            val type: WarningType
     ) : Issue {
         override fun toString(): String {
             return "WARNING: $method, $label, $type"
@@ -80,7 +80,7 @@ class NullabilityAnnotationsValidator {
     fun validateAll(codebase: Codebase, topLevelClassNames: List<String>) {
         for (topLevelClassName in topLevelClassNames) {
             val topLevelClass = codebase.findClass(topLevelClassName)
-                ?: throw DriverException("Trying to validate nullability annotations for class $topLevelClassName which could not be found in main codebase")
+                    ?: throw DriverException("Trying to validate nullability annotations for class $topLevelClassName which could not be found in main codebase")
             // Visit methods to check their return type, and parameters to check them. Don't visit
             // constructors as we don't want to check their return types. This visits members of
             // inner classes as well.
@@ -105,10 +105,10 @@ class NullabilityAnnotationsValidator {
     fun validateAllFrom(codebase: Codebase, topLevelClassesList: File?) {
         if (topLevelClassesList != null) {
             val classes =
-                Files.readLines(topLevelClassesList, UTF_8)
-                    .filterNot { it.isBlank() }
-                    .map { it.trim() }
-                    .filterNot { it.startsWith("#") }
+                    Files.readLines(topLevelClassesList, UTF_8)
+                            .filterNot { it.isBlank() }
+                            .map { it.trim() }
+                            .filterNot { it.startsWith("#") }
             validateAll(codebase, classes)
         }
     }
@@ -134,16 +134,16 @@ class NullabilityAnnotationsValidator {
     }
 
     private fun isNullFromTypeParam(it: AnnotationItem) =
-        it.qualifiedName?.endsWith("NullFromTypeParam") == true
+            it.qualifiedName?.endsWith("NullFromTypeParam") == true
 
     private fun isAnyNullabilityAnnotation(it: AnnotationItem) =
-        it.isNullnessAnnotation() || isNullFromTypeParam(it)
+            it.isNullnessAnnotation() || isNullFromTypeParam(it)
 
     private fun checkItemNullability(
-        type: TypeItem,
-        nullability: AnnotationItem?,
-        method: MethodItem,
-        label: String
+            type: TypeItem,
+            nullability: AnnotationItem?,
+            method: MethodItem,
+            label: String
     ) {
         when {
             // Primitive (may not have nullability):

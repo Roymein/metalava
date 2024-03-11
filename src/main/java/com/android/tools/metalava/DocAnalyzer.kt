@@ -54,8 +54,8 @@ const val ADD_DEPRECATED_IN_TEXT = false
  *       This will also attempt to fix common typos (Andriod->Android etc).
  */
 class DocAnalyzer(
-    /** The codebase to analyze */
-    private val codebase: Codebase
+        /** The codebase to analyze */
+        private val codebase: Codebase
 ) {
 
     /** Computes the visible part of the API from all the available code in the codebase */
@@ -119,10 +119,10 @@ class DocAnalyzer(
                 */
                 if (findThreadAnnotations(annotations).size > 1) {
                     reporter.report(
-                        Issues.MULTIPLE_THREAD_ANNOTATIONS,
-                        item,
-                        "Found more than one threading annotation on $item; " +
-                            "the auto-doc feature does not handle this correctly"
+                            Issues.MULTIPLE_THREAD_ANNOTATIONS,
+                            item,
+                            "Found more than one threading annotation on $item; " +
+                                    "the auto-doc feature does not handle this correctly"
                     )
                 }
             }
@@ -132,8 +132,8 @@ class DocAnalyzer(
                 for (annotation in annotations) {
                     val name = annotation.qualifiedName
                     if (name != null &&
-                        name.endsWith("Thread") &&
-                        name.startsWith(ANDROIDX_ANNOTATION_PREFIX)
+                            name.endsWith("Thread") &&
+                            name.startsWith(ANDROIDX_ANNOTATION_PREFIX)
                     ) {
                         if (result == null) {
                             result = mutableListOf()
@@ -160,10 +160,10 @@ class DocAnalyzer(
             }
 
             private fun handleAnnotation(
-                annotation: AnnotationItem,
-                item: Item,
-                depth: Int,
-                visitedClasses: MutableSet<String> = mutableSetOf()
+                    annotation: AnnotationItem,
+                    item: Item,
+                    depth: Int,
+                    visitedClasses: MutableSet<String> = mutableSetOf()
             ) {
                 val name = annotation.qualifiedName
                 if (name == null || name.startsWith(JAVA_LANG_PREFIX)) {
@@ -186,9 +186,11 @@ class DocAnalyzer(
                     "androidx.annotation.RequiresPermission" -> handleRequiresPermission(annotation, item)
                     "androidx.annotation.IntRange",
                     "androidx.annotation.FloatRange" -> handleRange(annotation, item)
+
                     "androidx.annotation.IntDef",
                     "androidx.annotation.LongDef",
                     "androidx.annotation.StringDef" -> handleTypeDef(annotation, item)
+
                     "android.annotation.RequiresFeature" -> handleRequiresFeature(annotation, item)
                     "androidx.annotation.RequiresApi" -> handleRequiresApi(annotation, item)
                     "android.provider.Column" -> handleColumn(annotation, item)
@@ -204,8 +206,8 @@ class DocAnalyzer(
                 annotation.resolve()?.modifiers?.annotations()?.forEach { nested ->
                     if (depth == 20) { // Temp debugging
                         throw StackOverflowError(
-                            "Unbounded recursion, processing annotation ${annotation.toSource()} " +
-                                "in $item in ${item.sourceFile()} "
+                                "Unbounded recursion, processing annotation ${annotation.toSource()} " +
+                                        "in $item in ${item.sourceFile()} "
                         )
                     } else if (nested.qualifiedName !in visitedClasses) {
                         handleAnnotation(nested, item, depth + 1, visitedClasses)
@@ -215,7 +217,7 @@ class DocAnalyzer(
 
             private fun handleKotlinDeprecation(annotation: AnnotationItem, item: Item) {
                 val text = (annotation.findAttribute("message") ?: annotation.findAttribute(ATTR_VALUE))
-                    ?.value?.value()?.toString() ?: return
+                        ?.value?.value()?.toString() ?: return
                 if (text.isBlank() || item.documentation.contains(text)) {
                     return
                 }
@@ -224,23 +226,23 @@ class DocAnalyzer(
             }
 
             private fun handleInliningDocs(
-                annotation: AnnotationItem,
-                item: Item
+                    annotation: AnnotationItem,
+                    item: Item
             ) {
                 if (annotation.isNullable() || annotation.isNonNull()) {
                     // Some docs already specifically talk about null policy; in that case,
                     // don't include the docs (since it may conflict with more specific conditions
                     // outlined in the docs).
                     val doc =
-                        if (item is ParameterItem) {
-                            item.containingMethod().findTagDocumentation("param", item.name())
-                                ?: ""
-                        } else if (item is MethodItem) {
-                            // Don't inspect param docs (and other tags) for this purpose.
-                            item.findMainDocumentation() + (item.findTagDocumentation("return") ?: "")
-                        } else {
-                            item.documentation
-                        }
+                            if (item is ParameterItem) {
+                                item.containingMethod().findTagDocumentation("param", item.name())
+                                        ?: ""
+                            } else if (item is MethodItem) {
+                                // Don't inspect param docs (and other tags) for this purpose.
+                                item.findMainDocumentation() + (item.findTagDocumentation("return") ?: "")
+                            } else {
+                                item.documentation
+                            }
                     if (doc.contains("null") && mentionsNull.matcher(doc).find()) {
                         return
                     }
@@ -250,13 +252,16 @@ class DocAnalyzer(
                     is FieldItem -> {
                         addDoc(annotation, "memberDoc", item)
                     }
+
                     is MethodItem -> {
                         addDoc(annotation, "memberDoc", item)
                         addDoc(annotation, "returnDoc", item)
                     }
+
                     is ParameterItem -> {
                         addDoc(annotation, "paramDoc", item)
                     }
+
                     is ClassItem -> {
                         addDoc(annotation, "classDoc", item)
                     }
@@ -264,8 +269,8 @@ class DocAnalyzer(
             }
 
             private fun handleRequiresPermission(
-                annotation: AnnotationItem,
-                item: Item
+                    annotation: AnnotationItem,
+                    item: Item
             ) {
                 if (item !is MemberItem) {
                     return
@@ -278,10 +283,12 @@ class DocAnalyzer(
                         "value", "allOf" -> {
                             values = attribute.leafValues()
                         }
+
                         "anyOf" -> {
                             any = true
                             values = attribute.leafValues()
                         }
+
                         "conditional" -> {
                             conditional = attribute.value.value() == true
                         }
@@ -318,13 +325,13 @@ class DocAnalyzer(
                             val v = value.value()?.toString() ?: value.toSource()
                             if (editDistance(CARRIER_PRIVILEGES_MARKER, v, 3) < 3) {
                                 reporter.report(
-                                    Issues.MISSING_PERMISSION, item,
-                                    "Unrecognized permission `$v`; did you mean `$CARRIER_PRIVILEGES_MARKER`?"
+                                        Issues.MISSING_PERMISSION, item,
+                                        "Unrecognized permission `$v`; did you mean `$CARRIER_PRIVILEGES_MARKER`?"
                                 )
                             } else {
                                 reporter.report(
-                                    Issues.MISSING_PERMISSION, item,
-                                    "Cannot find permission field for $value required by $item (may be hidden or removed)"
+                                        Issues.MISSING_PERMISSION, item,
+                                        "Cannot find permission field for $value required by $item (may be hidden or removed)"
                                 )
                             }
                             sb.append(value.toSource())
@@ -333,8 +340,8 @@ class DocAnalyzer(
                                 sb.append("{@link ${field.containingClass().qualifiedName()}#${field.name()}}")
                             } else {
                                 reporter.report(
-                                    Issues.MISSING_PERMISSION, item,
-                                    "Permission $value required by $item is hidden or removed"
+                                        Issues.MISSING_PERMISSION, item,
+                                        "Permission $value required by $item is hidden or removed"
                                 )
                                 sb.append("${field.containingClass().qualifiedName()}.${field.name()}")
                             }
@@ -346,8 +353,8 @@ class DocAnalyzer(
             }
 
             private fun handleRange(
-                annotation: AnnotationItem,
-                item: Item
+                    annotation: AnnotationItem,
+                    item: Item
             ) {
                 val from: String? = annotation.findAttribute("from")?.value?.toSource()
                 val to: String? = annotation.findAttribute("to")?.value?.toSource()
@@ -371,8 +378,8 @@ class DocAnalyzer(
             }
 
             private fun handleTypeDef(
-                annotation: AnnotationItem,
-                item: Item
+                    annotation: AnnotationItem,
+                    item: Item
             ) {
                 val values = annotation.findAttribute("value")?.leafValues() ?: return
                 val flag = annotation.findAttribute("flag")?.value?.toSource() == "true"
@@ -391,21 +398,23 @@ class DocAnalyzer(
 
                 values.forEachIndexed { index, value ->
                     sb.append(
-                        when (index) {
-                            0 -> {
-                                ""
-                            }
-                            values.size - 1 -> {
-                                if (flag) {
-                                    ", and "
-                                } else {
-                                    ", or "
+                            when (index) {
+                                0 -> {
+                                    ""
+                                }
+
+                                values.size - 1 -> {
+                                    if (flag) {
+                                        ", and "
+                                    } else {
+                                        ", or "
+                                    }
+                                }
+
+                                else -> {
+                                    ", "
                                 }
                             }
-                            else -> {
-                                ", "
-                            }
-                        }
                     )
 
                     val field = value.resolve()
@@ -416,9 +425,9 @@ class DocAnalyzer(
                             // Typedef annotation references field which isn't part of the API: don't
                             // try to link to it.
                             reporter.report(
-                                Issues.HIDDEN_TYPEDEF_CONSTANT, item,
-                                "Typedef references constant which isn't part of the API, skipping in documentation: " +
-                                    "${field.containingClass().qualifiedName()}#${field.name()}"
+                                    Issues.HIDDEN_TYPEDEF_CONSTANT, item,
+                                    "Typedef references constant which isn't part of the API, skipping in documentation: " +
+                                            "${field.containingClass().qualifiedName()}#${field.name()}"
                             )
                             sb.append(field.containingClass().qualifiedName() + "." + field.name())
                         }
@@ -430,8 +439,8 @@ class DocAnalyzer(
             }
 
             private fun handleRequiresFeature(
-                annotation: AnnotationItem,
-                item: Item
+                    annotation: AnnotationItem,
+                    item: Item
             ) {
                 val value = annotation.findAttribute("value")?.leafValues()?.firstOrNull() ?: return
                 val sb = StringBuilder(100)
@@ -440,8 +449,8 @@ class DocAnalyzer(
                 sb.append("Requires the ")
                 if (field == null) {
                     reporter.report(
-                        Issues.MISSING_PERMISSION, item,
-                        "Cannot find feature field for $value required by $item (may be hidden or removed)"
+                            Issues.MISSING_PERMISSION, item,
+                            "Cannot find feature field for $value required by $item (may be hidden or removed)"
                     )
                     sb.append("{@link ${value.toSource()}}")
                 } else {
@@ -449,8 +458,8 @@ class DocAnalyzer(
                         sb.append("{@link ${field.containingClass().qualifiedName()}#${field.name()} ${field.containingClass().simpleName()}#${field.name()}} ")
                     } else {
                         reporter.report(
-                            Issues.MISSING_PERMISSION, item,
-                            "Feature field $value required by $item is hidden or removed"
+                                Issues.MISSING_PERMISSION, item,
+                                "Feature field $value required by $item is hidden or removed"
                         )
                         sb.append("${field.containingClass().simpleName()}#${field.name()} ")
                     }
@@ -463,8 +472,8 @@ class DocAnalyzer(
             }
 
             private fun handleRequiresApi(
-                annotation: AnnotationItem,
-                item: Item
+                    annotation: AnnotationItem,
+                    item: Item
             ) {
                 val level = run {
                     val api = annotation.findAttribute("api")?.leafValues()?.firstOrNull()?.value()
@@ -481,8 +490,8 @@ class DocAnalyzer(
             }
 
             private fun handleColumn(
-                annotation: AnnotationItem,
-                item: Item
+                    annotation: AnnotationItem,
+                    item: Item
             ) {
                 val value = annotation.findAttribute("value")?.leafValues()?.firstOrNull() ?: return
                 val readOnly = annotation.findAttribute("readOnly")?.leafValues()?.firstOrNull()?.value() == true
@@ -499,8 +508,8 @@ class DocAnalyzer(
                 sb.append("")
                 if (field == null) {
                     reporter.report(
-                        Issues.MISSING_COLUMN, item,
-                        "Cannot find feature field for $value required by $item (may be hidden or removed)"
+                            Issues.MISSING_COLUMN, item,
+                            "Cannot find feature field for $value required by $item (may be hidden or removed)"
                     )
                     sb.append("{@link ${value.toSource()}}")
                 } else {
@@ -508,8 +517,8 @@ class DocAnalyzer(
                         sb.append("{@link ${field.containingClass().qualifiedName()}#${field.name()} ${field.containingClass().simpleName()}#${field.name()}} ")
                     } else {
                         reporter.report(
-                            Issues.MISSING_COLUMN, item,
-                            "Feature field $value required by $item is hidden or removed"
+                                Issues.MISSING_COLUMN, item,
+                                "Feature field $value required by $item is hidden or removed"
                         )
                         sb.append("${field.containingClass().simpleName()}#${field.name()} ")
                     }
@@ -542,6 +551,7 @@ class DocAnalyzer(
             is MethodItem ->
                 // Document as part of return annotation, not member doc
                 item.appendDocumentation(doc, if (returnValue) "@return" else null)
+
             else -> item.appendDocumentation(doc)
         }
     }
@@ -617,14 +627,14 @@ class DocAnalyzer(
     /** Replacements to perform in documentation */
     @Suppress("SpellCheckingInspection")
     val typos = mapOf(
-        "JetPack" to "Jetpack",
-        "Andriod" to "Android",
-        "Kitkat" to "KitKat",
-        "LemonMeringuePie" to "Lollipop",
-        "LMP" to "Lollipop",
-        "KeyLimePie" to "KitKat",
-        "KLP" to "KitKat",
-        "teh" to "the"
+            "JetPack" to "Jetpack",
+            "Andriod" to "Android",
+            "Kitkat" to "KitKat",
+            "LemonMeringuePie" to "Lollipop",
+            "LMP" to "Lollipop",
+            "KeyLimePie" to "KitKat",
+            "KLP" to "KitKat",
+            "teh" to "the"
     )
 
     private fun tweakGrammar() {
@@ -642,9 +652,9 @@ class DocAnalyzer(
                             val new = doc.replace(Regex("\\b$typo\\b"), replacement)
                             if (new != doc) {
                                 reporter.report(
-                                    Issues.TYPO,
-                                    item,
-                                    "Replaced $typo with $replacement in the documentation for $item"
+                                        Issues.TYPO,
+                                        item,
+                                        "Replaced $typo with $replacement in the documentation for $item"
                                 )
                                 doc = new
                                 item.documentation = doc
@@ -746,9 +756,9 @@ class DocAnalyzer(
                 item.appendDocumentation(code, "@apiSince")
             } else {
                 reporter.report(
-                    Issues.FORBIDDEN_TAG, item,
-                    "Documentation should not specify @apiSince " +
-                        "manually; it's computed and injected at build time by $PROGRAM_NAME"
+                        Issues.FORBIDDEN_TAG, item,
+                        "Documentation should not specify @apiSince " +
+                                "manually; it's computed and injected at build time by $PROGRAM_NAME"
                 )
             }
         }
@@ -757,9 +767,9 @@ class DocAnalyzer(
     private fun addApiExtensionsDocumentation(sdkExtSince: List<SdkAndVersion>, item: Item) {
         if (item.documentation.contains("@sdkExtSince")) {
             reporter.report(
-                Issues.FORBIDDEN_TAG, item,
-                "Documentation should not specify @sdkExtSince " +
-                    "manually; it's computed and injected at build time by $PROGRAM_NAME"
+                    Issues.FORBIDDEN_TAG, item,
+                    "Documentation should not specify @sdkExtSince " +
+                            "manually; it's computed and injected at build time by $PROGRAM_NAME"
             )
         }
         // Don't emit an @sdkExtSince for every item in sdkExtSince; instead, limit output to the
@@ -789,7 +799,7 @@ class DocAnalyzer(
             if (ADD_DEPRECATED_IN_TEXT) {
                 // TODO: *pre*pend instead!
                 val description =
-                    "<p class=\"caution\"><strong>This class was deprecated in API level $code.</strong></p>"
+                        "<p class=\"caution\"><strong>This class was deprecated in API level $code.</strong></p>"
                 item.appendDocumentation(description, "@deprecated", append = false)
             }
 
@@ -797,9 +807,9 @@ class DocAnalyzer(
                 item.appendDocumentation(code, "@deprecatedSince")
             } else {
                 reporter.report(
-                    Issues.FORBIDDEN_TAG, item,
-                    "Documentation should not specify @deprecatedSince " +
-                        "manually; it's computed and injected at build time by $PROGRAM_NAME"
+                        Issues.FORBIDDEN_TAG, item,
+                        "Documentation should not specify @deprecatedSince " +
+                                "manually; it's computed and injected at build time by $PROGRAM_NAME"
                 )
             }
         }
@@ -821,9 +831,9 @@ fun ApiLookup.getMethodVersion(method: PsiMethod): Int {
     val containingClass = method.containingClass ?: return -1
     val owner = containingClass.qualifiedName ?: return -1
     val desc = defaultEvaluator.getMethodDescription(
-        method,
-        includeName = false,
-        includeReturn = false
+            method,
+            includeName = false,
+            includeReturn = false
     )
     return getMethodVersion(owner, if (method.isConstructor) "<init>" else method.name, desc)
 }
@@ -843,9 +853,9 @@ fun ApiLookup.getMethodDeprecatedIn(method: PsiMethod): Int {
     val containingClass = method.containingClass ?: return -1
     val owner = containingClass.qualifiedName ?: return -1
     val desc = defaultEvaluator.getMethodDescription(
-        method,
-        includeName = false,
-        includeReturn = false
+            method,
+            includeName = false,
+            includeReturn = false
     )
     return getMethodDeprecatedIn(owner, method.name, desc)
 }
@@ -923,86 +933,97 @@ private fun createSymbolToSdkExtSinceMap(xmlFile: File): Map<String, List<SdkAnd
     data class OuterClass(val name: String, val idAndVersionList: List<IdAndVersion>?)
 
     val sdkIdentifiers = mutableMapOf<Int, SdkIdentifier>(
-        ApiToExtensionsMap.ANDROID_PLATFORM_SDK_ID to SdkIdentifier(ApiToExtensionsMap.ANDROID_PLATFORM_SDK_ID, "Android", "Android", "null")
+            ApiToExtensionsMap.ANDROID_PLATFORM_SDK_ID to SdkIdentifier(ApiToExtensionsMap.ANDROID_PLATFORM_SDK_ID, "Android", "Android", "null")
     )
     var lastSeenClass: OuterClass? = null
     val elementToIdAndVersionMap = mutableMapOf<String, List<IdAndVersion>>()
     val memberTags = listOf("class", "method", "field")
     val parser = SAXParserFactory.newDefaultInstance().newSAXParser()
     parser.parse(
-        xmlFile,
-        object : DefaultHandler() {
-            override fun startElement(uri: String, localName: String, qualifiedName: String, attributes: Attributes) {
-                if (qualifiedName == "sdk") {
-                    val id: Int = attributes.getValue("id")?.toIntOrNull() ?: throw IllegalArgumentException("<sdk>: missing or non-integer id attribute")
-                    val shortname: String = attributes.getValue("shortname") ?: throw IllegalArgumentException("<sdk>: missing shortname attribute")
-                    val name: String = attributes.getValue("name") ?: throw IllegalArgumentException("<sdk>: missing name attribute")
-                    val reference: String = attributes.getValue("reference") ?: throw IllegalArgumentException("<sdk>: missing reference attribute")
-                    sdkIdentifiers.put(id, SdkIdentifier(id, shortname, name, reference))
-                } else if (memberTags.contains(qualifiedName)) {
-                    val name: String = attributes.getValue("name") ?: throw IllegalArgumentException("<$qualifiedName>: missing name attribute")
-                    val idAndVersionList: List<IdAndVersion>? = attributes.getValue("sdks")?.split(",")?.map {
-                        val (sdk, version) = it.split(":")
-                        IdAndVersion(sdk.toInt(), version.toInt())
-                    }?.toList()
+            xmlFile,
+            object : DefaultHandler() {
+                override fun startElement(uri: String, localName: String, qualifiedName: String, attributes: Attributes) {
+                    if (qualifiedName == "sdk") {
+                        val id: Int = attributes.getValue("id")?.toIntOrNull()
+                                ?: throw IllegalArgumentException("<sdk>: missing or non-integer id attribute")
+                        val shortname: String = attributes.getValue("shortname")
+                                ?: throw IllegalArgumentException("<sdk>: missing shortname attribute")
+                        val name: String = attributes.getValue("name")
+                                ?: throw IllegalArgumentException("<sdk>: missing name attribute")
+                        val reference: String = attributes.getValue("reference")
+                                ?: throw IllegalArgumentException("<sdk>: missing reference attribute")
+                        sdkIdentifiers.put(id, SdkIdentifier(id, shortname, name, reference))
+                    } else if (memberTags.contains(qualifiedName)) {
+                        val name: String = attributes.getValue("name")
+                                ?: throw IllegalArgumentException("<$qualifiedName>: missing name attribute")
+                        val idAndVersionList: List<IdAndVersion>? = attributes.getValue("sdks")?.split(",")?.map {
+                            val (sdk, version) = it.split(":")
+                            IdAndVersion(sdk.toInt(), version.toInt())
+                        }?.toList()
 
-                    // Populate elementToIdAndVersionMap. The keys constructed here are derived from
-                    // api-versions.xml; when used elsewhere in DocAnalyzer, the keys will be
-                    // derived from PsiItems. The two sources use slightly different nomenclature,
-                    // so change "api-versions.xml nomenclature" to "PsiItems nomenclature" before
-                    // inserting items in the map.
-                    //
-                    // Nomenclature differences:
-                    //   - constructors are named "<init>()V" in api-versions.xml, but
-                    //     "ClassName()V" in PsiItems
-                    //   - inner classes are named "Outer#Inner" in api-versions.xml, but
-                    //     "Outer.Inner" in PsiItems
-                    when (qualifiedName) {
-                        "class" -> {
-                            lastSeenClass = OuterClass(name.replace('/', '.').replace('$', '.'), idAndVersionList)
-                            if (idAndVersionList != null) {
-                                elementToIdAndVersionMap["${lastSeenClass!!.name}"] = idAndVersionList
+                        // Populate elementToIdAndVersionMap. The keys constructed here are derived from
+                        // api-versions.xml; when used elsewhere in DocAnalyzer, the keys will be
+                        // derived from PsiItems. The two sources use slightly different nomenclature,
+                        // so change "api-versions.xml nomenclature" to "PsiItems nomenclature" before
+                        // inserting items in the map.
+                        //
+                        // Nomenclature differences:
+                        //   - constructors are named "<init>()V" in api-versions.xml, but
+                        //     "ClassName()V" in PsiItems
+                        //   - inner classes are named "Outer#Inner" in api-versions.xml, but
+                        //     "Outer.Inner" in PsiItems
+                        when (qualifiedName) {
+                            "class" -> {
+                                lastSeenClass = OuterClass(name.replace('/', '.').replace('$', '.'), idAndVersionList)
+                                if (idAndVersionList != null) {
+                                    elementToIdAndVersionMap["${lastSeenClass!!.name}"] = idAndVersionList
+                                }
                             }
-                        }
-                        "method", "field" -> {
-                            val shortName = if (name.startsWith("<init>")) {
-                                // constructors in api-versions.xml are named '<init>': rename to
-                                // name of class instead, and strip signature: '<init>()V' -> 'Foo'
-                                lastSeenClass!!.name.substringAfterLast('.')
-                            } else {
-                                // strip signature: 'foo()V' -> 'foo'
-                                name.substringBefore('(')
-                            }
-                            val element = "${lastSeenClass!!.name}#$shortName"
-                            if (idAndVersionList != null) {
-                                elementToIdAndVersionMap[element] = idAndVersionList
-                            } else if (lastSeenClass!!.idAndVersionList != null) {
-                                elementToIdAndVersionMap[element] = lastSeenClass!!.idAndVersionList!!
+
+                            "method", "field" -> {
+                                val shortName = if (name.startsWith("<init>")) {
+                                    // constructors in api-versions.xml are named '<init>': rename to
+                                    // name of class instead, and strip signature: '<init>()V' -> 'Foo'
+                                    lastSeenClass!!.name.substringAfterLast('.')
+                                } else {
+                                    // strip signature: 'foo()V' -> 'foo'
+                                    name.substringBefore('(')
+                                }
+                                val element = "${lastSeenClass!!.name}#$shortName"
+                                if (idAndVersionList != null) {
+                                    elementToIdAndVersionMap[element] = idAndVersionList
+                                } else if (lastSeenClass!!.idAndVersionList != null) {
+                                    elementToIdAndVersionMap[element] = lastSeenClass!!.idAndVersionList!!
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            override fun endElement(uri: String, localName: String, qualifiedName: String) {
-                if (qualifiedName == "class") {
-                    lastSeenClass = null
+                override fun endElement(uri: String, localName: String, qualifiedName: String) {
+                    if (qualifiedName == "class") {
+                        lastSeenClass = null
+                    }
                 }
             }
-        }
     )
 
     val elementToSdkExtSinceMap = mutableMapOf<String, List<SdkAndVersion>>()
     for (entry in elementToIdAndVersionMap.entries) {
         elementToSdkExtSinceMap[entry.key] = entry.value.map {
-            val name = sdkIdentifiers.get(it.first)?.name ?: throw IllegalArgumentException("SDK reference to unknown <sdk> with id ${it.first}")
+            val name = sdkIdentifiers.get(it.first)?.name
+                    ?: throw IllegalArgumentException("SDK reference to unknown <sdk> with id ${it.first}")
             SdkAndVersion(it.first, name, it.second)
         }
     }
     return elementToSdkExtSinceMap
 }
 
-private fun NodeList.firstOrNull(): Node? = if (length > 0) { item(0) } else { null }
+private fun NodeList.firstOrNull(): Node? = if (length > 0) {
+    item(0)
+} else {
+    null
+}
 
 private typealias IdAndVersion = Pair<Int, Int>
 

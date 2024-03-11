@@ -43,10 +43,10 @@ class RewriteAnnotations {
             // Copy and convert
             target.parentFile.mkdirs()
             target.writeText(
-                source.readText(UTF_8).replace(
-                    "\npublic @interface",
-                    "\n@interface"
-                )
+                    source.readText(UTF_8).replace(
+                            "\npublic @interface",
+                            "\n@interface"
+                    )
             )
         } else if (source.isDirectory) {
             val newPackage = if (pkg.isEmpty()) fileName else "$pkg.$fileName"
@@ -62,9 +62,10 @@ class RewriteAnnotations {
     private fun hasSourceRetention(codebase: Codebase?, qualifiedName: String): Boolean {
         when {
             qualifiedName == RECENTLY_NULLABLE ||
-                qualifiedName == RECENTLY_NONNULL ||
-                qualifiedName == ANDROID_NULLABLE ||
-                qualifiedName == ANDROID_NONNULL -> return false
+                    qualifiedName == RECENTLY_NONNULL ||
+                    qualifiedName == ANDROID_NULLABLE ||
+                    qualifiedName == ANDROID_NONNULL -> return false
+
             qualifiedName.equals(ANDROID_SDK_CONSTANT) -> return true
             qualifiedName.startsWith("androidx.annotation.") -> return true
         }

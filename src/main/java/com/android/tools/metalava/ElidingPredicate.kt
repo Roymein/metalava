@@ -31,12 +31,12 @@ class ElidingPredicate(private val wrapped: Predicate<Item>) : Predicate<Item> {
         // override then we can elide it.
         return if (method is MethodItem && !method.isConstructor()) {
             val differentSuper = method.findPredicateSuperMethod(
-                Predicate { test ->
-                    // We're looking for included and perfect signature
-                    wrapped.test(test) &&
-                        test is MethodItem &&
-                        MethodItem.sameSignature(method, test, false)
-                }
+                    Predicate { test ->
+                        // We're looking for included and perfect signature
+                        wrapped.test(test) &&
+                                test is MethodItem &&
+                                MethodItem.sameSignature(method, test, false)
+                    }
             )
             differentSuper == null
         } else {

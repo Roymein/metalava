@@ -22,7 +22,7 @@ import com.android.tools.metalava.model.Item
 import java.io.File
 import java.util.function.Predicate
 
-/** Types of APIs emitted (or parsed etc) */
+/** Types of APIs emitted (or parsed etc.) */
 enum class ApiType(val flagName: String, val displayName: String = flagName) {
     /** The public API */
     PUBLIC_API("api", "public") {

@@ -80,15 +80,15 @@ enum class Severity(private val displayName: String) {
 }
 
 class Reporter(
-    /** [Baseline] file associated with this [Reporter]. If null, the global baseline is used. */
-    // See the comment on [getBaseline] for why it's nullable.
-    private val customBaseline: Baseline?,
+        /** [Baseline] file associated with this [Reporter]. If null, the global baseline is used. */
+        // See the comment on [getBaseline] for why it's nullable.
+        private val customBaseline: Baseline?,
 
-    /**
-     * An error message associated with this [Reporter], which should be shown to the user
-     * when metalava finishes with errors.
-     */
-    private val errorMessage: String?
+        /**
+         * An error message associated with this [Reporter], which should be shown to the user
+         * when metalava finishes with errors.
+         */
+        private val errorMessage: String?
 ) {
     private var errors = mutableListOf<String>()
     private var warningCount = 0
@@ -141,12 +141,13 @@ class Reporter(
         }
 
         fun dispatch(
-            which: (severity: Severity, location: String?, message: String, id: Issues.Issue) -> Boolean
+                which: (severity: Severity, location: String?, message: String, id: Issues.Issue) -> Boolean
         ) = when {
             psi != null -> which(severity, elementToLocation(psi), message, id)
             item is PsiItem -> which(severity, elementToLocation(item.psi()), message, id)
             item is TextItem ->
                 which(severity, (item as? TextItem)?.position.toString(), message, id)
+
             else -> which(severity, null as String?, message, id)
         }
 
@@ -224,7 +225,7 @@ class Reporter(
         }
 
         if (message != null && value.startsWith(id) && value.endsWith(message) &&
-            (value == "$id:$message" || value == "$id: $message")
+                (value == "$id:$message" || value == "$id: $message")
         ) {
             return true
         }
@@ -266,9 +267,9 @@ class Reporter(
         // element's name is or falling back to the first line of its modifier list (which may
         // include annotations) or lastly to the start of the element itself
         val rangeElement = (sourceElement as? PsiNameIdentifierOwner)?.nameIdentifier
-            ?: (sourceElement as? KtModifierListOwner)?.modifierList
-            ?: (sourceElement as? PsiModifierListOwner)?.modifierList
-            ?: sourceElement
+                ?: (sourceElement as? KtModifierListOwner)?.modifierList
+                ?: (sourceElement as? PsiModifierListOwner)?.modifierList
+                ?: sourceElement
 
         val range = getTextRange(rangeElement)
         val lineNumber = if (range == null) {
@@ -294,27 +295,27 @@ class Reporter(
 
     /** Alias to allow method reference to `dispatch` in [report] */
     private fun doReport(severity: Severity, location: String?, message: String, id: Issues.Issue?) =
-        report(severity, location, message, id)
+            report(severity, location, message, id)
 
     fun report(
-        severity: Severity,
-        location: String?,
-        message: String,
-        id: Issues.Issue? = null,
-        color: Boolean = options.color
+            severity: Severity,
+            location: String?,
+            message: String,
+            id: Issues.Issue? = null,
+            color: Boolean = options.color
     ): Boolean {
         if (severity == HIDDEN) {
             return false
         }
 
         val effectiveSeverity =
-            if (severity == LINT && options.lintsAreErrors)
-                ERROR
-            else if (severity == WARNING && options.warningsAreErrors) {
-                ERROR
-            } else {
-                severity
-            }
+                if (severity == LINT && options.lintsAreErrors)
+                    ERROR
+                else if (severity == WARNING && options.warningsAreErrors) {
+                    ERROR
+                } else {
+                    severity
+                }
 
         val formattedMessage = format(effectiveSeverity, location, message, id, color, options.omitLocations)
         if (effectiveSeverity == ERROR) {
@@ -328,12 +329,12 @@ class Reporter(
     }
 
     private fun format(
-        severity: Severity,
-        location: String?,
-        message: String,
-        id: Issues.Issue?,
-        color: Boolean,
-        omitLocations: Boolean
+            severity: Severity,
+            location: String?,
+            message: String,
+            id: Issues.Issue?,
+            color: Boolean,
+            omitLocations: Boolean
     ): String {
         val sb = StringBuilder(100)
 
@@ -385,20 +386,20 @@ class Reporter(
     }
 
     private fun reportEvenIfSuppressed(
-        severity: Severity,
-        location: String?,
-        message: String,
-        id: Issues.Issue
+            severity: Severity,
+            location: String?,
+            message: String,
+            id: Issues.Issue
     ): Boolean {
         options.reportEvenIfSuppressedWriter?.println(
-            format(
-                severity,
-                location,
-                message,
-                id,
-                color = false,
-                omitLocations = false
-            )
+                format(
+                        severity,
+                        location,
+                        message,
+                        id,
+                        color = false,
+                        omitLocations = false
+                )
         )
         return true
     }
@@ -421,7 +422,7 @@ class Reporter(
     /** Write the error message set to this [Reporter], if any errors have been detected. */
     fun writeErrorMessage(writer: PrintWriter) {
         if (hasErrors()) {
-            errorMessage ?. let { writer.write(it) }
+            errorMessage?.let { writer.write(it) }
         }
     }
 
@@ -454,7 +455,7 @@ class Reporter(
 }
 
 private val SUPPRESS_ANNOTATIONS = listOf(
-    ANDROID_SUPPRESS_LINT,
-    JAVA_LANG_SUPPRESS_WARNINGS,
-    KOTLIN_SUPPRESS
+        ANDROID_SUPPRESS_LINT,
+        JAVA_LANG_SUPPRESS_WARNINGS,
+        KOTLIN_SUPPRESS
 )

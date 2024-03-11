@@ -38,19 +38,19 @@ import java.util.function.Predicate
  * [added] or [removed] when items are not matched
  */
 open class ComparisonVisitor(
-    /**
-     * Whether constructors should be visited as part of a [#visitMethod] call
-     * instead of just a [#visitConstructor] call. Helps simplify visitors that
-     * don't care to distinguish between the two cases. Defaults to true.
-     */
-    val visitConstructorsAsMethods: Boolean = true,
-    /**
-     * Normally if a new item is found, the visitor will
-     * only visit the top level newly added item, not all
-     * of its children. This flags enables you to request
-     * all individual items to also be visited.
-     */
-    val visitAddedItemsRecursively: Boolean = false
+        /**
+         * Whether constructors should be visited as part of a [#visitMethod] call
+         * instead of just a [#visitConstructor] call. Helps simplify visitors that
+         * don't care to distinguish between the two cases. Defaults to true.
+         */
+        val visitConstructorsAsMethods: Boolean = true,
+        /**
+         * Normally if a new item is found, the visitor will
+         * only visit the top level newly added item, not all
+         * of its children. This flags enables you to request
+         * all individual items to also be visited.
+         */
+        val visitAddedItemsRecursively: Boolean = false
 ) {
     open fun compare(old: Item, new: Item) {}
     open fun added(new: Item) {}
@@ -115,12 +115,12 @@ class CodebaseComparator {
     }
 
     private fun compare(
-        visitor: ComparisonVisitor,
-        oldList: List<ItemTree>,
-        newList: List<ItemTree>,
-        newParent: Item?,
-        oldParent: Item?,
-        filter: Predicate<Item>?
+            visitor: ComparisonVisitor,
+            oldList: List<ItemTree>,
+            newList: List<ItemTree>,
+            newParent: Item?,
+            oldParent: Item?,
+            filter: Predicate<Item>?
     ) {
         // Debugging tip: You can print out a tree like this: ItemTree.prettyPrint(list)
         var index1 = 0
@@ -145,12 +145,14 @@ class CodebaseComparator {
                                 visitAdded(new, oldParent, visitor, newTree, filter)
                             }
                         }
+
                         compare < 0 -> {
                             index1++
                             if (old.emit) {
                                 visitRemoved(old, oldTree, visitor, newParent, filter)
                             }
                         }
+
                         else -> {
                             if (new.emit) {
                                 if (old.emit) {
@@ -194,26 +196,26 @@ class CodebaseComparator {
     }
 
     private fun visitAdded(
-        new: Item,
-        oldParent: Item?,
-        visitor: ComparisonVisitor,
-        newTree: ItemTree,
-        filter: Predicate<Item>?
+            new: Item,
+            oldParent: Item?,
+            visitor: ComparisonVisitor,
+            newTree: ItemTree,
+            filter: Predicate<Item>?
     ) {
         // If it's a method, we may not have added a new method,
         // we may simply have inherited it previously and overriding
         // it now (or in the case of signature files, identical overrides
         // are not explicitly listed and therefore not added to the model)
         val inherited =
-            if (new is MethodItem && oldParent is ClassItem) {
-                oldParent.findMethod(
-                    template = new,
-                    includeSuperClasses = true,
-                    includeInterfaces = true
-                )?.duplicate(oldParent)
-            } else {
-                null
-            }
+                if (new is MethodItem && oldParent is ClassItem) {
+                    oldParent.findMethod(
+                            template = new,
+                            includeSuperClasses = true,
+                            includeInterfaces = true
+                    )?.duplicate(oldParent)
+                } else {
+                    null
+                }
 
         if (inherited != null) {
             visitCompare(visitor, inherited, new)
@@ -257,6 +259,7 @@ class CodebaseComparator {
                     }
                 }
             }
+
             is FieldItem -> visitor.added(item)
             is ParameterItem -> visitor.added(item)
             is PropertyItem -> visitor.added(item)
@@ -264,11 +267,11 @@ class CodebaseComparator {
     }
 
     private fun visitRemoved(
-        old: Item,
-        oldTree: ItemTree,
-        visitor: ComparisonVisitor,
-        newParent: Item?,
-        filter: Predicate<Item>?
+            old: Item,
+            oldTree: ItemTree,
+            visitor: ComparisonVisitor,
+            newParent: Item?,
+            filter: Predicate<Item>?
     ) {
 
         // If it's a method, we may not have removed the method, we may have simply
@@ -277,17 +280,17 @@ class CodebaseComparator {
         // class was hidden then the signature file may have listed the method as being
         // declared on the subclass
         val inheritedMethod =
-            if (old is MethodItem && !old.isConstructor() && newParent is ClassItem) {
-                val superMethod = newParent.findPredicateMethodWithSuper(old, filter)
+                if (old is MethodItem && !old.isConstructor() && newParent is ClassItem) {
+                    val superMethod = newParent.findPredicateMethodWithSuper(old, filter)
 
-                if (superMethod != null && (filter == null || filter.test(superMethod))) {
-                    superMethod.duplicate(newParent)
+                    if (superMethod != null && (filter == null || filter.test(superMethod))) {
+                        superMethod.duplicate(newParent)
+                    } else {
+                        null
+                    }
                 } else {
                     null
                 }
-            } else {
-                null
-            }
 
         if (inheritedMethod != null) {
             visitCompare(visitor, old, inheritedMethod)
@@ -301,21 +304,21 @@ class CodebaseComparator {
 
         // fields may also be moved to superclasses like methods may
         val inheritedField =
-            if (old is FieldItem && newParent is ClassItem) {
-                val superField = newParent.findField(
-                    fieldName = old.name(),
-                    includeSuperClasses = true,
-                    includeInterfaces = true
-                )
+                if (old is FieldItem && newParent is ClassItem) {
+                    val superField = newParent.findField(
+                            fieldName = old.name(),
+                            includeSuperClasses = true,
+                            includeInterfaces = true
+                    )
 
-                if (superField != null && (filter == null || filter.test(superField))) {
-                    superField.duplicate(newParent)
+                    if (superField != null && (filter == null || filter.test(superField))) {
+                        superField.duplicate(newParent)
+                    } else {
+                        null
+                    }
                 } else {
                     null
                 }
-            } else {
-                null
-            }
 
         if (inheritedField != null) {
             visitCompare(visitor, old, inheritedField)
@@ -342,6 +345,7 @@ class CodebaseComparator {
                     }
                 }
             }
+
             is FieldItem -> visitor.removed(item, from as ClassItem?)
             is ParameterItem -> visitor.removed(item, from as MethodItem?)
             is PropertyItem -> visitor.removed(item, from as ClassItem?)
@@ -366,6 +370,7 @@ class CodebaseComparator {
                     }
                 }
             }
+
             is FieldItem -> visitor.compare(old, new as FieldItem)
             is ParameterItem -> visitor.compare(old, new as ParameterItem)
             is PropertyItem -> visitor.compare(old, new as PropertyItem)
@@ -398,9 +403,11 @@ class CodebaseComparator {
                     is PackageItem -> {
                         item1.qualifiedName().compareTo((item2 as PackageItem).qualifiedName())
                     }
+
                     is ClassItem -> {
                         item1.qualifiedName().compareTo((item2 as ClassItem).qualifiedName())
                     }
+
                     is MethodItem -> {
                         // Try to incrementally match aspects of the method until you can conclude
                         // whether they are the same or different.
@@ -457,18 +464,23 @@ class CodebaseComparator {
                         // The method names are different, return the result of the compareTo
                         delta
                     }
+
                     is FieldItem -> {
                         item1.name().compareTo((item2 as FieldItem).name())
                     }
+
                     is ParameterItem -> {
                         item1.parameterIndex.compareTo((item2 as ParameterItem).parameterIndex)
                     }
+
                     is AnnotationItem -> {
                         (item1.qualifiedName ?: "").compareTo((item2 as AnnotationItem).qualifiedName ?: "")
                     }
+
                     is PropertyItem -> {
                         item1.name().compareTo((item2 as PropertyItem).name())
                     }
+
                     else -> {
                         error("Unexpected item type ${item1.javaClass}")
                     }
@@ -535,36 +547,36 @@ class CodebaseComparator {
             val acceptAll = codebase.preFiltered || filter == null
             val predicate = if (acceptAll) Predicate { true } else filter!!
             codebase.accept(object : ApiVisitor(
-                nestInnerClasses = true,
-                inlineInheritedFields = true,
-                filterEmit = predicate,
-                filterReference = predicate,
-                // Whenever a caller passes arguments of "--show-annotation 'SomeAnnotation' --check-compatibility:api:released $oldApi",
-                // really what they mean is:
-                // 1. Definitions:
-                //  1.1 Define the SomeAnnotation API as the set of APIs that are either public or are annotated with @SomeAnnotation
-                //  1.2 $oldApi was previously the difference between the SomeAnnotation api and the public api
-                // 2. The caller would like Metalava to verify that all APIs that are known to have previously been part of the SomeAnnotation api remain part of the SomeAnnotation api
-                // So, when doing compatibility checking we want to consider public APIs even if the caller didn't explicitly pass --show-unannotated
-                showUnannotated = true
+                    nestInnerClasses = true,
+                    inlineInheritedFields = true,
+                    filterEmit = predicate,
+                    filterReference = predicate,
+                    // Whenever a caller passes arguments of "--show-annotation 'SomeAnnotation' --check-compatibility:api:released $oldApi",
+                    // really what they mean is:
+                    // 1. Definitions:
+                    //  1.1 Define the SomeAnnotation API as the set of APIs that are either public or are annotated with @SomeAnnotation
+                    //  1.2 $oldApi was previously the difference between the SomeAnnotation api and the public api
+                    // 2. The caller would like Metalava to verify that all APIs that are known to have previously been part of the SomeAnnotation api remain part of the SomeAnnotation api
+                    // So, when doing compatibility checking we want to consider public APIs even if the caller didn't explicitly pass --show-unannotated
+                    showUnannotated = true
             ) {
-                    override fun visitItem(item: Item) {
-                        val node = ItemTree(item)
-                        val parent = stack.peek()
-                        parent.children += node
+                override fun visitItem(item: Item) {
+                    val node = ItemTree(item)
+                    val parent = stack.peek()
+                    parent.children += node
 
-                        stack.push(node)
-                    }
+                    stack.push(node)
+                }
 
-                    override fun include(cls: ClassItem): Boolean = if (acceptAll) true else super.include(cls)
+                override fun include(cls: ClassItem): Boolean = if (acceptAll) true else super.include(cls)
 
-                    /** Include all classes in the tree, even implicitly defined classes (such as containing classes) */
-                    override fun shouldEmitClass(vc: VisitCandidate): Boolean = true
+                /** Include all classes in the tree, even implicitly defined classes (such as containing classes) */
+                override fun shouldEmitClass(vc: VisitCandidate): Boolean = true
 
-                    override fun afterVisitItem(item: Item) {
-                        stack.pop()
-                    }
-                })
+                override fun afterVisitItem(item: Item) {
+                    stack.pop()
+                }
+            })
         }
 
         if (codebases.count() >= 2) {

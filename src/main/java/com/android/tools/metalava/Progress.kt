@@ -79,10 +79,10 @@ private fun getCpuStats(): String {
     lastCpuMillis = cpuMillis
 
     return String.format(
-        "+%.1freal +%.1fusr +%.1fsys",
-        realDeltaMs / 1_000.0,
-        userDeltaMillis / 1_000.0,
-        sysDeltaMillis / 1_000.0
+            "+%.1freal +%.1fusr +%.1fsys",
+            realDeltaMs / 1_000.0,
+            userDeltaMillis / 1_000.0,
+            sysDeltaMillis / 1_000.0
     )
 }
 
@@ -90,11 +90,11 @@ private fun getMemoryStats(): String {
     val mu = memoryMXBean.getHeapMemoryUsage()
 
     return String.format(
-        "%dmi %dmu %dmc %dmx",
-        mu.init / 1024 / 1024,
-        mu.used / 1024 / 1024,
-        mu.committed / 1024 / 1024,
-        mu.max / 1024 / 1024
+            "%dmi %dmu %dmc %dmx",
+            mu.init / 1024 / 1024,
+            mu.used / 1024 / 1024,
+            mu.committed / 1024 / 1024,
+            mu.max / 1024 / 1024
     )
 }
 

@@ -17,7 +17,7 @@
 package com.android.tools.metalava
 
 class DriverException(
-    val stderr: String = "",
-    val stdout: String = "",
-    val exitCode: Int = if (stderr.isBlank()) 0 else -1
+        val stderr: String = "",
+        val stdout: String = "",
+        val exitCode: Int = if (stderr.isBlank()) 0 else -1
 ) : RuntimeException(stdout + stderr)

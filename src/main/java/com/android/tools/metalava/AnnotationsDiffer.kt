@@ -55,8 +55,8 @@ import kotlin.text.Charsets.UTF_8
  * file.
  */
 class AnnotationsDiffer(
-    private val superset: Codebase,
-    codebase: Codebase
+        private val superset: Codebase,
+        codebase: Codebase
 ) {
     private val relevant = HashSet<Item>(1000)
 
@@ -99,11 +99,11 @@ class AnnotationsDiffer(
             }
         }
         val filter =
-            if (codebase.supportsDocumentation()) {
-                ApiPredicate()
-            } else {
-                Predicate<Item> { true }
-            }
+                if (codebase.supportsDocumentation()) {
+                    ApiPredicate()
+                } else {
+                    Predicate<Item> { true }
+                }
         CodebaseComparator().compare(visitor, superset, codebase, filter)
     }
 

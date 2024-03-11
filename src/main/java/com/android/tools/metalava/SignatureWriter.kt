@@ -32,20 +32,20 @@ import java.io.PrintWriter
 import java.util.function.Predicate
 
 class SignatureWriter(
-    private val writer: PrintWriter,
-    filterEmit: Predicate<Item>,
-    filterReference: Predicate<Item>,
-    private val preFiltered: Boolean,
-    var emitHeader: EmitFileHeader = options.includeSignatureFormatVersionNonRemoved
+        private val writer: PrintWriter,
+        filterEmit: Predicate<Item>,
+        filterReference: Predicate<Item>,
+        private val preFiltered: Boolean,
+        var emitHeader: EmitFileHeader = options.includeSignatureFormatVersionNonRemoved
 ) : ApiVisitor(
-    visitConstructorsAsMethods = false,
-    nestInnerClasses = false,
-    inlineInheritedFields = true,
-    methodComparator = MethodItem.comparator,
-    fieldComparator = FieldItem.comparator,
-    filterEmit = filterEmit,
-    filterReference = filterReference,
-    showUnannotated = options.showUnannotated
+        visitConstructorsAsMethods = false,
+        nestInnerClasses = false,
+        inlineInheritedFields = true,
+        methodComparator = MethodItem.comparator,
+        fieldComparator = FieldItem.comparator,
+        filterEmit = filterEmit,
+        filterReference = filterReference,
+        showUnannotated = options.showUnannotated
 ) {
     init {
         if (emitHeader == EmitFileHeader.ALWAYS) {
@@ -157,13 +157,13 @@ class SignatureWriter(
 
     private fun writeModifiers(item: Item) {
         ModifierList.write(
-            writer = writer,
-            modifiers = item.modifiers,
-            item = item,
-            target = AnnotationTarget.SIGNATURE_FILE,
-            includeDeprecated = true,
-            skipNullnessAnnotations = options.outputKotlinStyleNulls,
-            omitCommonPackages = true
+                writer = writer,
+                modifiers = item.modifiers,
+                item = item,
+                target = AnnotationTarget.SIGNATURE_FILE,
+                includeDeprecated = true,
+                skipNullnessAnnotations = options.outputKotlinStyleNulls,
+                omitCommonPackages = true
         )
     }
 
@@ -177,11 +177,11 @@ class SignatureWriter(
         else cls.filteredSuperClassType(filterReference)
         if (superClass != null && !superClass.isJavaLangObject()) {
             val superClassString =
-                superClass.toTypeString(
-                    kotlinStyleNulls = false,
-                    context = superClass.asClass(),
-                    filter = filterReference
-                )
+                    superClass.toTypeString(
+                            kotlinStyleNulls = false,
+                            context = superClass.asClass(),
+                            filter = filterReference
+                    )
             write(" extends ")
             write(superClassString)
         }
@@ -199,27 +199,27 @@ class SignatureWriter(
 
         if (interfaces.any()) {
             val label =
-                if (isInterface) {
-                    val superInterface = cls.filteredSuperclass(filterReference)
-                    if (superInterface != null && !superInterface.isJavaLangObject()) {
-                        // For interfaces we've already listed "extends <super interface>"; we don't
-                        // want to repeat "extends " here
-                        ""
+                    if (isInterface) {
+                        val superInterface = cls.filteredSuperclass(filterReference)
+                        if (superInterface != null && !superInterface.isJavaLangObject()) {
+                            // For interfaces we've already listed "extends <super interface>"; we don't
+                            // want to repeat "extends " here
+                            ""
+                        } else {
+                            " extends"
+                        }
                     } else {
-                        " extends"
+                        " implements"
                     }
-                } else {
-                    " implements"
-                }
             write(label)
             interfaces.sortedWith(TypeItem.comparator).forEach { item ->
                 write(" ")
                 write(
-                    item.toTypeString(
-                        kotlinStyleNulls = false,
-                        context = item.asClass(),
-                        filter = filterReference
-                    )
+                        item.toTypeString(
+                                kotlinStyleNulls = false,
+                                context = item.asClass(),
+                                filter = filterReference
+                        )
                 )
             }
         }
@@ -242,8 +242,8 @@ class SignatureWriter(
                 write(", ")
             }
             if (parameter.hasDefaultValue() &&
-                options.outputDefaultValues &&
-                options.outputFormat.conciseDefaultValues
+                    options.outputDefaultValues &&
+                    options.outputFormat.conciseDefaultValues
             ) {
                 // Concise representation of a parameter with a default
                 write("optional ")
@@ -256,8 +256,8 @@ class SignatureWriter(
                 write(name)
             }
             if (parameter.isDefaultValueKnown() &&
-                options.outputDefaultValues &&
-                !options.outputFormat.conciseDefaultValues
+                    options.outputDefaultValues &&
+                    !options.outputFormat.conciseDefaultValues
             ) {
                 write(" = ")
                 val defaultValue = parameter.defaultValue()
@@ -273,19 +273,19 @@ class SignatureWriter(
     }
 
     private fun writeType(
-        item: Item,
-        type: TypeItem?,
-        outputKotlinStyleNulls: Boolean = options.outputKotlinStyleNulls
+            item: Item,
+            type: TypeItem?,
+            outputKotlinStyleNulls: Boolean = options.outputKotlinStyleNulls
     ) {
         type ?: return
 
         var typeString = type.toTypeString(
-            outerAnnotations = false,
-            innerAnnotations = true,
-            erased = false,
-            kotlinStyleNulls = outputKotlinStyleNulls,
-            context = item,
-            filter = filterReference
+                outerAnnotations = false,
+                innerAnnotations = true,
+                erased = false,
+                kotlinStyleNulls = outputKotlinStyleNulls,
+                context = item,
+                filter = filterReference
         )
 
         // Strip java.lang. prefix
